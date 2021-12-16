@@ -1,5 +1,5 @@
-import AmSynth from "../../../color_fields_v2 copie/src/utils/amSynth.js";
-import FmSynth from "../../../color_fields_v2 copie/src/utils/fmSynth.js";
+import FmSynth from "./fmSynth.js";
+import AmSynth from "./amSynth.js";
 import Enveloppe from "./enveloppe.js";
 import decibelToLinear from "../math/decibelToLinear.js";
 
