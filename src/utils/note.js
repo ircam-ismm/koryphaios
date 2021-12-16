@@ -1,4 +1,7 @@
+import AmSynth from "../../../color_fields_v2 copie/src/utils/amSynth.js";
+import FmSynth from "../../../color_fields_v2 copie/src/utils/fmSynth.js";
 import Enveloppe from "./enveloppe.js";
+import decibelToLinear from "../math/decibelToLinear.js";
 
 export default class Note {
   constructor(audioContext, noteDictOsc) {
@@ -10,17 +13,25 @@ export default class Note {
     this.metas = noteDictOsc.metas;
 
     this.output = this.audioContext.createGain();
-    // this.output.gain.value = functionOfVelocity
+    this.output.gain.value = decibelToLinear(this.velocity);
     this.modGain = this.audioContext.createGain();
 
     switch (this.metas.synthType) {
       case 'sine':
         this.synth = this.audioContext.createOscillator();
-        this.synth.frequency = this.frequency;
+        this.synth.frequency.value = this.frequency;
         break;
       case 'am':
+        this.synth = new AmSynth(this.audioContext);
+        this.synth.carrFreq = this.frequency;
+        this.synth.modFreq = this.metas.modFreq;
+        this.synth.modDepth = this.metas.modDepth;
         break;
       case 'fm':
+        this.synth = new FmSynth(this.audioContext);
+        this.synth.carrFreq = this.frequency;
+        this.synth.harmonicity = this.metas.harmonicity;
+        this.synth.modIndex = this.metas.modIndex;
         break;
       case 'granular':
         break;
@@ -33,13 +44,18 @@ export default class Note {
   }
 
   connect(dest) {
+    console.log(dest);
     this.output.connect(dest);
+  }
+
+  play(time) {
+    this.start(time);
+    this.stop(time + this.duration);
   }
 
   start(time) {
     this.enveloppe.apply(time);
     this.synth.start(time);
-    this.synth.stop(time + this.duration) //??
   };
 
   stop(time) {

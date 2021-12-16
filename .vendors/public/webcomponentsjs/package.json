@@ -1,0 +1,83 @@
+{
+  "_from": "@webcomponents/webcomponentsjs@^2.4.3",
+  "_id": "@webcomponents/webcomponentsjs@2.6.0",
+  "_inBundle": false,
+  "_integrity": "sha512-Moog+Smx3ORTbWwuPqoclr+uvfLnciVd6wdCaVscHPrxbmQ/IJKm3wbB7hpzJtXWjAq2l/6QMlO85aZiOdtv5Q==",
+  "_location": "/@webcomponents/webcomponentsjs",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "range",
+    "registry": true,
+    "raw": "@webcomponents/webcomponentsjs@^2.4.3",
+    "name": "@webcomponents/webcomponentsjs",
+    "escapedName": "@webcomponents%2fwebcomponentsjs",
+    "scope": "@webcomponents",
+    "rawSpec": "^2.4.3",
+    "saveSpec": null,
+    "fetchSpec": "^2.4.3"
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/@webcomponents/webcomponentsjs/-/webcomponentsjs-2.6.0.tgz",
+  "_shasum": "7d1674c40bddf0c6dd974c44ffd34512fe7274ff",
+  "_spec": "@webcomponents/webcomponentsjs@^2.4.3",
+  "_where": "/Users/golvet/Documents/soundworks/color_fields_v2",
+  "author": {
+    "name": "The Polymer Project Authors",
+    "url": "https://polymer.github.io/AUTHORS.txt"
+  },
+  "bugs": {
+    "url": "https://github.com/webcomponents/polyfills/issues?q=is%3Aissue+is%3Aopen+label%3A\"Package%3A+webcomponentsjs\""
+  },
+  "bundleDependencies": false,
+  "deprecated": false,
+  "description": "Web Components Polyfills",
+  "devDependencies": {
+    "@webcomponents/custom-elements": "^1.5.0",
+    "@webcomponents/shadycss": "^1.11.0",
+    "@webcomponents/shadydom": "^1.9.0",
+    "@webcomponents/template": "^1.5.0",
+    "@webcomponents/url": "^0.7.8",
+    "babel-preset-minify": "^0.4.3",
+    "get-own-property-symbols": "^0.9.2",
+    "gulp-concat": "^2.6.1",
+    "promise-polyfill": "^8.0.0"
+  },
+  "files": [
+    "bundles/**/*",
+    "CHANGELOG.md",
+    "custom-elements-es5-adapter.js",
+    "src/**/*.js",
+    "webcomponents-bundle.d.ts",
+    "webcomponents-bundle.js*",
+    "webcomponents-loader.js"
+  ],
+  "gitHead": "966c28a79fcd46dedc4367be6b93404565ab9cf6",
+  "homepage": "https://github.com/webcomponents/polyfills/tree/master/packages/webcomponentsjs",
+  "keywords": [
+    "webcomponents",
+    "web-components",
+    "polyfill",
+    "shim"
+  ],
+  "license": "BSD-3-Clause",
+  "main": "webcomponents-bundle.js",
+  "name": "@webcomponents/webcomponentsjs",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/webcomponents/polyfills.git",
+    "directory": "packages/webcomponentsjs"
+  },
+  "scripts": {
+    "build": "tsc && gulp",
+    "build:watch": "chokidar --initial --follow-symlinks 'src/entrypoints/**/*.js' 'ts_src/**/*.ts' 'node_modules/@webcomponents/**/*.js' -c 'npm run build'",
+    "clean": "gulp clean",
+    "prepack": "npm run build",
+    "regen-package-lock": "rm -rf node_modules package-lock.json; npm install"
+  },
+  "version": "2.6.0"
+}

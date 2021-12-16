@@ -26,7 +26,6 @@ export default class Enveloppe {
         this.targetParam.linearRampToValueAtTime(targetVal, startTime + endTimeNT*this.duration);
       }
       else if (curve > 0) { 
-        console.log("POSITIVE CURVE")
         //recreating max/msp's curve~. see https://cycling74.com/forums/math-behind-function-curve
         const transDurNT = endTimeNT-prevTimeNT;
         let currTimeNT = prevTimeNT;
@@ -45,7 +44,6 @@ export default class Enveloppe {
         //Last step
         this.targetParam.linearRampToValueAtTime(targetVal, startTime + endTimeNT*this.duration);
       } else {
-        console.log("NEGATIVE CURVE")
         const transDurNT = endTimeNT-prevTimeNT;
         let currTimeNT = prevTimeNT;
         const stepRealTime = 0.1  //Doing linear approximation of the curve with this step (in seconds of real time) 
