@@ -4,6 +4,9 @@ class PlayerExperience extends AbstractExperience {
   constructor(server, clientTypes, options = {}) {
     super(server, clientTypes);
 
+    this.checkin = this.require('checkin');
+    this.sync = this.require('sync');
+
   }
 
   start() {

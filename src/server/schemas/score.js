@@ -4,10 +4,4 @@ export default {
     default: [],
     event: true,
   },
-  message: {
-    type: 'string',
-    default: null,
-    nullable: true,
-    event: true,
-  },
 }

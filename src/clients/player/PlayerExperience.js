@@ -2,6 +2,7 @@ import { AbstractExperience } from '@soundworks/core/client';
 import { render, html } from 'lit-html';
 import renderInitializationScreens from '@soundworks/template-helpers/client/render-initialization-screens.js';
 import Note from '../../utils/note';
+import MasterBus from '../../utils/masterBus';
 
 class PlayerExperience extends AbstractExperience {
   constructor(client, config, $container, audioContext) {
@@ -13,6 +14,8 @@ class PlayerExperience extends AbstractExperience {
     this.audioContext = audioContext;
 
     // require plugins if needed
+    this.checkin = this.require('checkin');
+    this.group = 1 + Math.floor(Math.random() * 6);
 
     renderInitializationScreens(client, config, $container);
   }
@@ -20,31 +23,58 @@ class PlayerExperience extends AbstractExperience {
   async start() {
     super.start();
 
-    this.score = await this.client.stateManager.attach('score');
+    //Audio pipeline
+    this.globalMasterBus = new MasterBus(this.audioContext, { panner: false });
+    this.groupMasterBus = new MasterBus(this.audioContext, { panner: false });
+    this.busInput = this.audioContext.createGain();
+    
+    this.globalMasterBus.connect(this.audioContext.destination);
+    this.groupMasterBus.connect(this.globalMasterBus.input);
+    this.busInput.connect(this.groupMasterBus.input);
+    
 
-    const dictNote = {
-      frequency: 1100,
-      velocity: -20,
-      duration: 5,
-      enveloppe: [[0, 0, 0], [0.5, 1, -0.2], [1, 0, 0]],
-      metas: {
-        synthType: 'sine',
-      }
-    };
-
-    this.score.subscribe(async updates => {
-      if (updates.hasOwnProperty('message')){
-        console.log(updates.message);
-      }
-      if (updates.hasOwnProperty('note')){
-        const noteDict = updates.note;
-        noteDict.enveloppe = JSON.parse(noteDict.enveloppe);
-        console.log('note formatted : ', noteDict);
-        const note = new Note(this.audioContext, updates.note);
-        note.connect(this.audioContext.destination);
-        note.play(this.audioContext.currentTime);
+    //State manager handling
+    this.client.stateManager.observe(async (schemaName, stateId, nodeId) => {
+      if (schemaName == "masterControls") {
+        const groupControls = await this.client.stateManager.attach(schemaName, stateId);
+        if (groupControls.get('group') === this.group) {
+          this.groupMasterControls = groupControls;
+        }
+        else if (groupControls.get('group') === 0) {
+          this.globalMasterControls = groupControls;
+        }
       }
     });
+
+    this.playerState = await this.client.stateManager.create('player', { group: this.group });
+    await this.playerState.set({ id: this.checkin.get('index')});
+    console.log('checkin id :', this.playerState.get('id'));  
+
+    this.playerState.subscribe(updates => {
+      if (updates.hasOwnProperty('note')) {
+        console.log('received note :', updates.note);
+        //play note or chords;
+        if (Array.isArray(updates.note)) {
+          for (let i = 0; i < updates.note.length; i++) {
+            const note = new Note(this.audioContext, updates.note[i]);
+            note.connect(this.audioContext.destination);
+            note.play(this.audioContext.currentTime);
+          }
+
+        } else {
+          const note = new Note(this.audioContext, updates.note);
+          note.connect(this.audioContext.destination);
+          note.play(this.audioContext.currentTime);
+        }
+      }
+    });
+    
+    this.globalMasterControls.subscribe(updates => {
+      for (const [key, value] of Object.entries(updates)) {
+        this.globalMasterBus[key] = value;
+      } 
+    });
+
 
     window.addEventListener('resize', () => this.render());
     this.render();
