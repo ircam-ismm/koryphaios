@@ -1,6 +1,6 @@
 export default {
-  group: {
-    type: 'integer',
+  synth: {
+    type: 'string',
     nullable: true,
     default: null,
   },

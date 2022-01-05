@@ -77,12 +77,10 @@ server.stateManager.registerSchema('masterControls', masterControlsSchema);
     const ngroups = 6;
 
     const score = await server.stateManager.create('score');
-    const globalMasterControls = await server.stateManager.create('masterControls', {group: 0});
-    const groupMasterControls = new Set();
-    for (let i = 1; i <= ngroups; i++){
-      const groupControls = await server.stateManager.create('masterControls', { group: i });
-      groupMasterControls.add(groupControls);
-    } 
+    const globalMasterControls = await server.stateManager.create('masterControls', {synth: 'global'});
+    const sineMasterControls = await server.stateManager.create('masterControls', { synth: 'sine' });
+    const amMasterControls = await server.stateManager.create('masterControls', { synth: 'am' });
+    const fmMasterControls = await server.stateManager.create('masterControls', { synth: 'fm' });
 
     const playerExperience = new PlayerExperience(server, 'player');
     const controllerExperience = new ControllerExperience(server, 'controller');
@@ -122,49 +120,52 @@ server.stateManager.registerSchema('masterControls', masterControlsSchema);
 
     //Receiving notes from Max by OSC
     score.subscribe(async updates => {
-      if (updates.hasOwnProperty('note')) {
-        const noteDict = updates.note;
-        if (Array.isArray(noteDict)) {
-          for (let i = 0; i < noteDict.length; i++) {
-            //Parsing Max list into smth readable by js
-            const splitStr = noteDict[i].enveloppe.split(' ');
-            const env = [];
-            let i = 1;
-            while (i < splitStr.length - 1) {
-              const bp = [];
-              bp.push(parseFloat(splitStr[i + 1]));
-              bp.push(parseFloat(splitStr[i + 2]));
-              bp.push(parseFloat(splitStr[i + 3]));
-              env.push(bp);
-              i += 5;
-            }
-            noteDict[i].enveloppe = env;
-          }
-
-        } else {
-          //Parsing Max list into smth readable by js
-          const splitStr = noteDict.enveloppe.split(' ');
-          const env = [];
-          let i = 1;
-          while (i < splitStr.length - 1) {
-            const bp = [];
-            bp.push(parseFloat(splitStr[i + 1]));
-            bp.push(parseFloat(splitStr[i + 2]));
-            bp.push(parseFloat(splitStr[i + 3]));
-            env.push(bp);
-            i += 5;
-          }
-          noteDict.enveloppe = env;
-        }
+      if (updates.hasOwnProperty('message')) {
+        console.log(updates.message);
+      }
+      if (updates.hasOwnProperty('notes')) {
+        console.log("note received");
+        // if (Array.isArray(noteDict)) {
+        //   for (let i = 0; i < noteDict.length; i++) {
+        //     //Parsing Max list into smth readable by js
+        //     const splitStr = noteDict[i].enveloppe.split(' ');
+        //     const env = [];
+        //     let i = 1;
+        //     while (i < splitStr.length - 1) {
+        //       const bp = [];
+        //       bp.push(parseFloat(splitStr[i + 1]));
+        //       bp.push(parseFloat(splitStr[i + 2]));
+        //       bp.push(parseFloat(splitStr[i + 3]));
+        //       env.push(bp);
+        //       i += 5;
+        //     }
+        //     noteDict[i].enveloppe = env;
+        //   }
+        // } else {
+        //   //Parsing Max list into smth readable by js
+        //   // console.log(noteDict.enveloppe);
+        //   const splitStr = noteDict.enveloppe;
+        //   const env = [];
+        //   let i = 1;
+        //   while (i < splitStr.length - 1) {
+        //     const bp = [];
+        //     bp.push(parseFloat(splitStr[i + 1]));
+        //     bp.push(parseFloat(splitStr[i + 2]));
+        //     bp.push(parseFloat(splitStr[i + 3]));
+        //     env.push(bp);
+        //     i += 5;
+        //   }
+        //   noteDict.enveloppe = env;
+        // }
         
         //Dispatch note among players
         players.forEach(playerState => {
-          const id = playerState.get('id');
-          if (id % modCounter === noteCounter) {
-            playerState.set({ note: noteDict, playTime: sync.getSyncTime() + 0.2 });
-          }
+          // const id = playerState.get('id');
+          // if (id % modCounter === noteCounter) {
+          playerState.set({ note: updates.notes, playTime: sync.getSyncTime() + 0.2 });
+          // }
         });    
-        noteCounter = (noteCounter+1) % modCounter;
+        // noteCounter = (noteCounter+1) % modCounter;
       }
     });
 

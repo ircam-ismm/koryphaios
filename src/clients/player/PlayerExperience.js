@@ -4,6 +4,12 @@ import renderInitializationScreens from '@soundworks/template-helpers/client/ren
 import Note from '../../utils/note';
 import MasterBus from '../../utils/masterBus';
 
+/*
+TODO : 
+
+- Enveloppe : differencier decibel/linéaire
+*/
+
 class PlayerExperience extends AbstractExperience {
   constructor(client, config, $container, audioContext) {
     super(client);
@@ -15,6 +21,9 @@ class PlayerExperience extends AbstractExperience {
 
     // require plugins if needed
     this.checkin = this.require('checkin');
+    this.sync = this.require('sync');
+
+    
     this.group = 1 + Math.floor(Math.random() * 6);
 
     renderInitializationScreens(client, config, $container);
@@ -24,25 +33,37 @@ class PlayerExperience extends AbstractExperience {
     super.start();
 
     //Audio pipeline
-    this.globalMasterBus = new MasterBus(this.audioContext, { panner: false });
-    this.groupMasterBus = new MasterBus(this.audioContext, { panner: false });
-    this.busInput = this.audioContext.createGain();
-    
+    this.globalMasterBus = new MasterBus(this.audioContext, { panner: false, filter: true});
+    const synths = ['sine', 'am', 'fm'];
+    this.synthMasterBus = {};
+    for (let i = 0; i < synths.length; i++) {
+      const synthType = synths[i];
+      this.synthMasterBus[synthType] = new MasterBus(this.audioContext, { panner: false });
+      this.synthMasterBus[synthType].connect(this.globalMasterBus.input);
+    }
     this.globalMasterBus.connect(this.audioContext.destination);
-    this.groupMasterBus.connect(this.globalMasterBus.input);
-    this.busInput.connect(this.groupMasterBus.input);
     
 
+    this.synthMasterControls = {};
     //State manager handling
     this.client.stateManager.observe(async (schemaName, stateId, nodeId) => {
       if (schemaName == "masterControls") {
-        const groupControls = await this.client.stateManager.attach(schemaName, stateId);
-        if (groupControls.get('group') === this.group) {
-          this.groupMasterControls = groupControls;
-        }
-        else if (groupControls.get('group') === 0) {
-          this.globalMasterControls = groupControls;
-        }
+        const synthControls = await this.client.stateManager.attach(schemaName, stateId);
+        const synthType = synthControls.get('synth');
+        this.synthMasterControls[synthType] = synthControls;
+
+        synthControls.subscribe(updates => {
+          if (synthType === 'global') {
+            for (const [key, value] of Object.entries(updates)) {
+              this.globalMasterBus[key] = value;
+            }
+          }
+          else {
+            for (const [key, value] of Object.entries(updates)) {
+              this.synthMasterBus[synthType][key] = value;
+            }
+          }
+        });
       }
     });
 
@@ -53,27 +74,27 @@ class PlayerExperience extends AbstractExperience {
     this.playerState.subscribe(updates => {
       if (updates.hasOwnProperty('note')) {
         console.log('received note :', updates.note);
+        const playTime = this.sync.getLocalTime(updates.playTime)
         //play note or chords;
         if (Array.isArray(updates.note)) {
           for (let i = 0; i < updates.note.length; i++) {
             const note = new Note(this.audioContext, updates.note[i]);
-            note.connect(this.audioContext.destination);
-            note.play(this.audioContext.currentTime);
+            note.connect(this.synthMasterBus[updates.note[i].metas.synthType].input);
+            note.play(playTime);
           }
 
         } else {
           const note = new Note(this.audioContext, updates.note);
-          note.connect(this.audioContext.destination);
-          note.play(this.audioContext.currentTime);
+          note.connect(this.synthMasterBus[updates.note.metas.synthType].input);
+          note.play(playTime);
         }
       }
     });
-    
-    this.globalMasterControls.subscribe(updates => {
-      for (const [key, value] of Object.entries(updates)) {
-        this.globalMasterBus[key] = value;
-      } 
-    });
+
+    // const testSine = this.audioContext.createOscillator();
+    // testSine.type = 'square';
+    // testSine.connect(this.globalMasterBus.input);
+    // testSine.start();
 
 
     window.addEventListener('resize', () => this.render());

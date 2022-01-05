@@ -44,7 +44,6 @@ export default class Note {
   }
 
   connect(dest) {
-    console.log(dest);
     this.output.connect(dest);
   }
 

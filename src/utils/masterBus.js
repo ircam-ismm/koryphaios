@@ -55,8 +55,8 @@ export default class MasterBus {
       },
     };
 
-    //Dev set parameters;
-    // const _lowPassFreq = 80;
+    // // Dev set parameters;
+    // const _lowPassFreq = 20;
     // const _highPassFreq = 12000;
 
     //Create audio nodes
@@ -74,10 +74,10 @@ export default class MasterBus {
     if (this._hasFilter) {  
       this._highFilter = this.audioContext.createBiquadFilter();
       this._highFilter.type = "highpass";
-      this._highFilter.frequency.value = _highPassFreq;
+      this._highFilter.frequency.value = this.userParams.highPassFreq.default;
       this._lowFilter = this.audioContext.createBiquadFilter();
       this._lowFilter.type = "lowpass";
-      this._lowFilter.frequency.value = _lowPassFreq;
+      this._lowFilter.frequency.value = this.userParams.lowPassFreq.default;
     }
 
 
