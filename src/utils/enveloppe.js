@@ -12,7 +12,7 @@ export default class Enveloppe {
     this.targetParam.linearRampToValueAtTime(1, startTime+3);
   }
 
-  apply(startTime) {
+  apply(startTime, stepRealTime = 0.1) {
     let prevTimeNT = this.breakpoints[0][0];
     let prevVal = this.breakpoints[0][1];
     this.targetParam.setValueAtTime(decibelToLinear(prevVal), startTime);
@@ -25,14 +25,13 @@ export default class Enveloppe {
       const [prevTimeNT, prevVal, prevCurve] = this.breakpoints[bp-1]; 
       
       if (Math.abs(curve) < 0.005) {
-        console.log(targetVal, decibelToLinear(targetVal), startTime + endTimeNT * this.duration);
         this.targetParam.linearRampToValueAtTime(decibelToLinear(targetVal), startTime + endTimeNT*this.duration);
       }
       else if (curve > 0) { 
         //recreating max/msp's curve~. see https://cycling74.com/forums/math-behind-function-curve
         const transDurNT = endTimeNT-prevTimeNT;
         let currTimeNT = prevTimeNT;
-        const stepRealTime = 0.1  //Doing linear approximation of the curve with this step (in seconds of real time) 
+        // const stepRealTime = 0.1  //Doing linear approximation of the curve with this step (in seconds of real time) 
         const timeIncrementNT = stepRealTime/this.duration;
         while (endTimeNT-currTimeNT > timeIncrementNT) {
           currTimeNT += timeIncrementNT;
@@ -49,7 +48,7 @@ export default class Enveloppe {
       } else {
         const transDurNT = endTimeNT-prevTimeNT;
         let currTimeNT = prevTimeNT;
-        const stepRealTime = 0.1  //Doing linear approximation of the curve with this step (in seconds of real time) 
+        // const stepRealTime = 0.1  //Doing linear approximation of the curve with this step (in seconds of real time) 
         const timeIncrementNT = stepRealTime/this.duration;
         while (endTimeNT-currTimeNT > timeIncrementNT) {
           currTimeNT += timeIncrementNT;

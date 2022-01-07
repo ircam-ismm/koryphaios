@@ -23,6 +23,8 @@ class ControllerExperience extends AbstractExperience {
 
     this.audioContext = audioContext;
 
+    this.midiSetupActive = false;
+    this.selectedControl = null;
 
     // require plugins if needed
 
@@ -36,10 +38,18 @@ class ControllerExperience extends AbstractExperience {
 
     this.masterControls = {};
     this.client.stateManager.observe(async (schemaName, stateId, nodeId) => {
-      if (schemaName == "masterControls"){
+      if (schemaName.includes("BusControls")){
+        const synthType = schemaName.substring(0, schemaName.indexOf("BusControls"));
         const groupControls = await this.client.stateManager.attach(schemaName, stateId);
-        const synthType = groupControls.get('synth');
         this.masterControls[synthType] = groupControls;
+
+        groupControls.subscribe(updates => {
+          const synths = ['global', 'sine', 'am', 'fm'];
+          for (const synth of synths) {
+            const $controls = document.body.querySelector(`#${synth}-controls`);
+            this.renderGroupControls(synth, $controls);
+          }
+        });
       }
     });
     
@@ -91,6 +101,54 @@ class ControllerExperience extends AbstractExperience {
       }
     });
     window.addEventListener('resize', () => this.render());
+
+    //MIDI
+    this.midiControlDict = {};
+
+    const getMIDIMessage = (midiMessage) => {
+      const [deviceId, channel, value] = midiMessage.data;
+      if (this.midiSetupActive) {
+        if (this.selectedControl !== null) {
+          this.midiControlDict[channel] = this.selectedControl.id
+        }
+      }
+      else {
+        const control = this.midiControlDict[channel];
+        if (control) {
+          const synthType = control.split('-')[0];
+          const key = control.split('-')[1];
+          switch (key) {
+            case 'mute':
+              console.log(value);
+              const muteVal = this.masterControls[synthType].get('mute');
+              if (value === 127) {
+                this.masterControls[synthType].set({ mute: !muteVal });
+              }
+              break;
+            case 'volume':
+              this.masterControls[synthType].set({ volume: -60. + value * 60. / 127. });
+              break;
+            case 'lowPassFreq':
+              this.masterControls[synthType].set({ lowPassFreq: 20 + value * (20000 - 20) / 127. });
+              break;
+            case 'highPassFreq':
+              this.masterControls[synthType].set({ highPassFreq: 20 + value * (20000 - 20) / 127. });
+              break;
+          }
+        }
+      }
+    }
+
+    const midiAccess = await navigator.requestMIDIAccess();
+    const midiInputDevices = midiAccess.inputs.values();
+    for (let device of midiInputDevices) {      
+      device.addEventListener('midimessage', getMIDIMessage);
+      // device.onmidimessage = getMIDIMessage;
+    } 
+
+
+
+    //Rendering
     this.render();
     setTimeout(() => { 
       const synths = ['global', 'sine', 'am', 'fm'];
@@ -99,6 +157,22 @@ class ControllerExperience extends AbstractExperience {
         this.renderGroupControls(synths[i], $controls); 
       }
     }, 50); // no workaround ??
+
+    //MIDI setup mode
+    setTimeout(() => {
+      const synths = ['global', 'sine', 'am', 'fm'];
+      const controls = ['mute', 'volume', 'lowPassFreq', 'highPassFreq'];
+      for (const synth of synths) {
+        for (const control of controls) {
+          const $control = document.body.querySelector(`#${synth}-${control}`);
+          $control.addEventListener('click', () => {
+            if (this.midiSetupActive) {
+              this.selectedControl = $control;
+            }
+          })
+        }
+      }
+    }, 200);
     
     // this.renderGroupControls(document.body.querySelector('#gp1-controls'));
   }
@@ -109,6 +183,11 @@ class ControllerExperience extends AbstractExperience {
     for (var i = 0; i < nLogged; i++) {
       $logger.removeChild($logger.lastChild);
     }
+  }
+
+  activateMidiSetup(activated) {
+    this.midiSetupActive = activated;
+    if (activated) {this.selectedControl = null}
   }
 
   renderGroupControls(synthType, container) {
@@ -136,8 +215,10 @@ class ControllerExperience extends AbstractExperience {
             left: 26%;
             top: 22%;
           "
+          id="${synthType}-mute";
           width="50";
           height="50";
+          ?active="${this.masterControls[synthType].get('mute')}"
           @change="${e => this.masterControls[synthType].set({ mute: e.detail.value })}"
         ></sc-toggle>
 
@@ -155,6 +236,7 @@ class ControllerExperience extends AbstractExperience {
             left: 26%;
             top: 42%;
           "
+          id="${synthType}-volume";
           height="40"
           width="290"
           min="-60"
@@ -178,6 +260,7 @@ class ControllerExperience extends AbstractExperience {
             left: 26%;
             top: 62%;
           "
+          id="${synthType}-lowPassFreq";
           height="40"
           width="290"
           min="20"
@@ -201,6 +284,7 @@ class ControllerExperience extends AbstractExperience {
             left: 26%;
             top: 82%;
           "
+          id="${synthType}-highPassFreq";
           height="40"
           width="290"
           min="20"
@@ -346,6 +430,25 @@ class ControllerExperience extends AbstractExperience {
           "
           id="fm-controls"
         >
+        </div>
+
+        <!--Toggle MIDI setup-->
+        <div
+          style="
+            position: absolute;
+            top: 70px;
+            left: 1200px;
+          "
+        >
+          <p
+            style="font-size: large"
+          >MIDI</br> setup</br> mode:<p>
+          <sc-toggle
+            height="50";
+            width="50";
+            @change="${e => this.activateMidiSetup(e.detail.value)}";
+          ></sc-toggle>
+
         </div>
         
       `, this.$container);

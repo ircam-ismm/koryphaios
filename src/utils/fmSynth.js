@@ -70,7 +70,6 @@ export default class FmSynth{
   }
   
   start(time) {
-    console.log(this.userParams.carrFreq.value)
     this._carrier.start(time);
     this._modulator.start(time);
   }

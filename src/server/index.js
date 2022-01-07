@@ -8,7 +8,7 @@ import { StateManagerOsc } from '@soundworks/state-manager-osc';
 
 import scoreSchema from './schemas/score.js';
 import playerSchema from './schemas/player.js';
-import masterControlsSchema from './schemas/masterControls.js';
+import busControlsSchema from './schemas/busControls.js';
 
 import pluginPlatformFactory from '@soundworks/plugin-platform/server';
 import pluginSyncFactory from '@soundworks/plugin-sync/server';
@@ -51,8 +51,10 @@ server.pluginManager.register('checkin', pluginCheckinFactory, {}, []);
 // server.stateManager.registerSchema(name, schema);
 server.stateManager.registerSchema('score', scoreSchema);
 server.stateManager.registerSchema('player', playerSchema);
-server.stateManager.registerSchema('masterControls', masterControlsSchema);
-
+server.stateManager.registerSchema('globalBusControls', busControlsSchema);
+server.stateManager.registerSchema('sineBusControls', busControlsSchema);
+server.stateManager.registerSchema('amBusControls', busControlsSchema);
+server.stateManager.registerSchema('fmBusControls', busControlsSchema);
 
 
 (async function launch() {
@@ -74,13 +76,13 @@ server.stateManager.registerSchema('masterControls', masterControlsSchema);
 
     const sync = server.pluginManager.get('sync');
 
-    const ngroups = 6;
+    console.log('random grouping :', randomGrouping(7, 3));
 
     const score = await server.stateManager.create('score');
-    const globalMasterControls = await server.stateManager.create('masterControls', {synth: 'global'});
-    const sineMasterControls = await server.stateManager.create('masterControls', { synth: 'sine' });
-    const amMasterControls = await server.stateManager.create('masterControls', { synth: 'am' });
-    const fmMasterControls = await server.stateManager.create('masterControls', { synth: 'fm' });
+    const globalMasterControls = await server.stateManager.create('globalBusControls');
+    const sineMasterControls = await server.stateManager.create('sineBusControls');
+    const amMasterControls = await server.stateManager.create('amBusControls');
+    const fmMasterControls = await server.stateManager.create('fmBusControls');
 
     const playerExperience = new PlayerExperience(server, 'player');
     const controllerExperience = new ControllerExperience(server, 'controller');
@@ -100,6 +102,7 @@ server.stateManager.registerSchema('masterControls', masterControlsSchema);
     const oscStateManager = new StateManagerOsc(server.stateManager, oscConfig);
     await oscStateManager.init();
 
+    //Observe players connections
     const players = new Set();
     let noteCounter = 0;
     const modCounter = 3;
@@ -120,52 +123,20 @@ server.stateManager.registerSchema('masterControls', masterControlsSchema);
 
     //Receiving notes from Max by OSC
     score.subscribe(async updates => {
-      if (updates.hasOwnProperty('message')) {
-        console.log(updates.message);
-      }
       if (updates.hasOwnProperty('notes')) {
-        console.log("note received");
-        // if (Array.isArray(noteDict)) {
-        //   for (let i = 0; i < noteDict.length; i++) {
-        //     //Parsing Max list into smth readable by js
-        //     const splitStr = noteDict[i].enveloppe.split(' ');
-        //     const env = [];
-        //     let i = 1;
-        //     while (i < splitStr.length - 1) {
-        //       const bp = [];
-        //       bp.push(parseFloat(splitStr[i + 1]));
-        //       bp.push(parseFloat(splitStr[i + 2]));
-        //       bp.push(parseFloat(splitStr[i + 3]));
-        //       env.push(bp);
-        //       i += 5;
-        //     }
-        //     noteDict[i].enveloppe = env;
-        //   }
-        // } else {
-        //   //Parsing Max list into smth readable by js
-        //   // console.log(noteDict.enveloppe);
-        //   const splitStr = noteDict.enveloppe;
-        //   const env = [];
-        //   let i = 1;
-        //   while (i < splitStr.length - 1) {
-        //     const bp = [];
-        //     bp.push(parseFloat(splitStr[i + 1]));
-        //     bp.push(parseFloat(splitStr[i + 2]));
-        //     bp.push(parseFloat(splitStr[i + 3]));
-        //     env.push(bp);
-        //     i += 5;
-        //   }
-        //   noteDict.enveloppe = env;
-        // }
+        // console.log("note received", updates.notes.length);
+        const dispatchStrategy = score.get('dispatchStrategy');
         
-        //Dispatch note among players
-        players.forEach(playerState => {
-          // const id = playerState.get('id');
-          // if (id % modCounter === noteCounter) {
-          playerState.set({ note: updates.notes, playTime: sync.getSyncTime() + 0.2 });
-          // }
-        });    
-        // noteCounter = (noteCounter+1) % modCounter;
+        switch (dispatchStrategy) {
+          case 'sendAll':
+            players.forEach(playerState => {
+              playerState.set({ note: updates.notes, playTime: sync.getSyncTime() + 0.1 });
+            });    
+            break;
+          case 'randomSpread':
+            const nNotes = updates.notes.length;   
+            break;
+        }
       }
     });
 
@@ -174,6 +145,21 @@ server.stateManager.registerSchema('masterControls', masterControlsSchema);
     console.error(err.stack);
   }
 })();
+
+function randomGrouping(nGroups, nPlayers) {
+  const players = Array.from(Array(nPlayers).keys());;
+  const groups = Array.from(new Array(nGroups), () => []);
+  let gp = 0;
+  while (players.length > 0) {
+    const randomIdx = Math.floor(Math.random() * players.length);
+    const player = players[randomIdx];
+    groups[gp].push(player);
+    players.splice(randomIdx, 1);
+    gp = (gp + 1)%nGroups;
+  }
+  return groups;
+}
+
 
 process.on('unhandledRejection', (reason, p) => {
   console.log('> Unhandled Promise Rejection');

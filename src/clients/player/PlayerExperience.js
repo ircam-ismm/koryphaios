@@ -22,6 +22,7 @@ class PlayerExperience extends AbstractExperience {
     // require plugins if needed
     this.checkin = this.require('checkin');
     this.sync = this.require('sync');
+    this.platform = this.require('platform');
 
     
     this.group = 1 + Math.floor(Math.random() * 6);
@@ -38,7 +39,7 @@ class PlayerExperience extends AbstractExperience {
     this.synthMasterBus = {};
     for (let i = 0; i < synths.length; i++) {
       const synthType = synths[i];
-      this.synthMasterBus[synthType] = new MasterBus(this.audioContext, { panner: false });
+      this.synthMasterBus[synthType] = new MasterBus(this.audioContext, { panner: false, filter: true });
       this.synthMasterBus[synthType].connect(this.globalMasterBus.input);
     }
     this.globalMasterBus.connect(this.audioContext.destination);

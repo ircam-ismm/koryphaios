@@ -1,9 +1,4 @@
 export default {
-  synth: {
-    type: 'string',
-    nullable: true,
-    default: null,
-  },
   mute: {
     type: 'boolean',
     default: false,

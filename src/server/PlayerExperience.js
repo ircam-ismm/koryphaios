@@ -6,6 +6,7 @@ class PlayerExperience extends AbstractExperience {
 
     this.checkin = this.require('checkin');
     this.sync = this.require('sync');
+    this.platform = this.require('platform');
 
   }
 

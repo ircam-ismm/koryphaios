@@ -4,10 +4,8 @@ export default {
     default: [],
     event: true,
   },
-  message: {
-    type: 'any',
-    default: null,
-    nullable: true,
-    event: true,
+  dispatchStrategy: {
+    type: 'string',
+    default: 'sendAll',
   }
 }
