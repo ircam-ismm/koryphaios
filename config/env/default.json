@@ -15,14 +15,14 @@
   // define if the HTTP server should be launched using secure connections.
   // For development purposes when set to `true` and no certificates are given
   // (cf. `httpsInfos`), a self-signed certificate is created.
-  useHttps: true,
+  useHttps: false,
 
   // paths to the key and certificate to be used in order to launch the https
   // server. Both entries are required otherwise a self-signed certificate
   // is generated.
   httpsInfos: {
-    key: '/Users/golvet/Documents/soundworks/color_fields_v2/config/env/certs/privkey.pem',
-    cert: '/Users/golvet/Documents/soundworks/color_fields_v2/config/env/certs/fullchain.pem',
+    key: '',
+    cert: '',
   },
 
   // @important: for node clients only, Ip of the server
