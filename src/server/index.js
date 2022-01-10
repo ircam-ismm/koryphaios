@@ -76,8 +76,6 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
 
     const sync = server.pluginManager.get('sync');
 
-    console.log('random grouping :', randomGrouping(7, 3));
-
     const score = await server.stateManager.create('score');
     const globalMasterControls = await server.stateManager.create('globalBusControls');
     const sineMasterControls = await server.stateManager.create('sineBusControls');
@@ -104,18 +102,20 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
 
     //Observe players connections
     const players = new Set();
-    let noteCounter = 0;
-    const modCounter = 3;
+    const playersIds = new Array();
 
     server.stateManager.observe(async (schemaName, stateId, nodeId) => {
       switch (schemaName) {
         case 'player':
           const playerState = await server.stateManager.attach(schemaName, stateId);
+          const plId = server.stateManager.get('id');
           playerState.onDetach(() => {
             // clean things
             players.delete(playerState);
+            playersIds.splice(playersIds.indexOf(plId), 1);
           });
           players.add(playerState);
+          playersIds.add(plId);
           break;
       }
     });
@@ -135,6 +135,18 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
             break;
           case 'randomSpread':
             const nNotes = updates.notes.length;   
+            const nPlayers = playersIds.length;
+            const assignment = randomGrouping(nNotes, nPlayers);
+            players.forEach(playerState => {
+              const plId = playerState.get('id');
+              const idIdx = playersIds.indexOf(plId);
+              const plAssignment = assignment[idIdx];
+              const notesToSend = [];
+              for (let n of plAssignment) {
+                notesToSend.push(updates.notes[n]);
+              }
+              playerState.set({ note: notesToSend, playTime: sync.getSyncTime() + 0.1 });
+            });  
             break;
         }
       }
@@ -146,20 +158,55 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
   }
 })();
 
-function randomGrouping(nGroups, nPlayers) {
-  const players = Array.from(Array(nPlayers).keys());;
-  const groups = Array.from(new Array(nGroups), () => []);
-  let gp = 0;
-  while (players.length > 0) {
-    const randomIdx = Math.floor(Math.random() * players.length);
-    const player = players[randomIdx];
-    groups[gp].push(player);
-    players.splice(randomIdx, 1);
-    gp = (gp + 1)%nGroups;
-  }
-  return groups;
-}
 
+function randomGrouping(nGroups, nPlayers) {
+  const assignment = Array.from(new Array(nPlayers), () => []);
+  if (nGroups <= nPlayers) {
+    const players = Array.from(Array(nPlayers).keys());
+    let gp = 0;
+    while (players.length > nPlayers%nGroups) {
+      const randomIdx = Math.floor(Math.random() * players.length);
+      const player = players[randomIdx];
+      assignment[player].push(gp);
+      players.splice(randomIdx, 1);
+      gp = (gp + 1) % nGroups;
+    }
+    const groups = Array.from(Array(nGroups).keys());
+    while (players.length > 0) {
+      const randomIdxPl = Math.floor(Math.random() * players.length);
+      const randomIdxGp = Math.floor(Math.random() * groups.length);
+      const player = players[randomIdxPl];
+      const group = groups[randomIdxGp];
+      assignment[player].push(group);
+      players.splice(randomIdxPl, 1);
+      groups.splice(randomIdxGp, 1);
+    }
+  } else {
+    const groups = Array.from(Array(nGroups).keys());
+    let pl = 0;
+    while (groups.length > nGroups%nPlayers) {
+      const randomIdx = Math.floor(Math.random() * groups.length);
+      const group = groups[randomIdx];
+      assignment[pl].push(group);
+      groups.splice(randomIdx, 1);
+      pl = (pl + 1) % nPlayers;
+      console.log(assignment);
+    }
+    console.log('second part');
+    const players = Array.from(Array(nPlayers).keys());
+    while (groups.length > 0) {
+      const randomIdxPl = Math.floor(Math.random() * players.length);
+      const randomIdxGp = Math.floor(Math.random() * groups.length);
+      const player = players[randomIdxPl];
+      const group = groups[randomIdxGp];
+      assignment[player].push(group);
+      players.splice(randomIdxPl, 1)  ;
+      groups.splice(randomIdxGp, 1);
+      console.log(assignment);
+    }
+  }
+  return assignment;
+}
 
 process.on('unhandledRejection', (reason, p) => {
   console.log('> Unhandled Promise Rejection');
