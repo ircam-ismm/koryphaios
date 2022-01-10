@@ -108,14 +108,14 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
       switch (schemaName) {
         case 'player':
           const playerState = await server.stateManager.attach(schemaName, stateId);
-          const plId = server.stateManager.get('id');
+          const plId = playerState.get('id');
           playerState.onDetach(() => {
             // clean things
             players.delete(playerState);
             playersIds.splice(playersIds.indexOf(plId), 1);
           });
           players.add(playerState);
-          playersIds.add(plId);
+          playersIds.push(plId);
           break;
       }
     });
@@ -129,6 +129,7 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
         
         switch (dispatchStrategy) {
           case 'sendAll':
+            console.log('sendingNotes');
             players.forEach(playerState => {
               playerState.set({ note: updates.notes, playTime: sync.getSyncTime() + 0.1 });
             });    
