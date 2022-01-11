@@ -1,10 +1,11 @@
 import decibelToLinear from "../math/decibelToLinear";
 
 export default class Enveloppe {
-  constructor(targetParam, duration, breakpoints){
+  constructor(targetParam, duration, breakpoints, inDb = false){
     this.targetParam = targetParam;
     this.duration = duration;
     this.breakpoints = breakpoints;
+    this.inDb = inDb;
   }
 
   test(startTime) {
@@ -15,17 +16,19 @@ export default class Enveloppe {
   apply(startTime, stepRealTime = 0.1) {
     let prevTimeNT = this.breakpoints[0][0];
     let prevVal = this.breakpoints[0][1];
-    this.targetParam.setValueAtTime(decibelToLinear(prevVal), startTime);
+    prevVal = this.inDb ? decibelToLinear(prevVal) : prevVal;
+    this.targetParam.setValueAtTime(prevVal, startTime);
     for (let bp = 1; bp < this.breakpoints.length; bp++) {
-      const [endTimeNT, targetVal, curve] = this.breakpoints[bp]; 
+      let [endTimeNT, targetVal, curve] = this.breakpoints[bp]; 
       //endTime is normalized wrt to total duration of enveloppe and relative to start time
       //NT suffix refers to "normalized time"
       //All calculations for curve are made in normalized time
 
-      const [prevTimeNT, prevVal, prevCurve] = this.breakpoints[bp-1]; 
+      let [prevTimeNT, prevVal, prevCurve] = this.breakpoints[bp-1]; 
       
       if (Math.abs(curve) < 0.005) {
-        this.targetParam.linearRampToValueAtTime(decibelToLinear(targetVal), startTime + endTimeNT*this.duration);
+        targetVal = this.inDb ? decibelToLinear(targetVal) : targetVal;
+        this.targetParam.linearRampToValueAtTime(targetVal, startTime + endTimeNT*this.duration);
       }
       else if (curve > 0) { 
         //recreating max/msp's curve~. see https://cycling74.com/forums/math-behind-function-curve
@@ -39,12 +42,14 @@ export default class Enveloppe {
           const hp = Math.pow((curve + 1e-20) * 1.2, 0.41)*0.91;
           const fp = hp / (1.0 - hp);
           const gp = (Math.exp(fp * gx) - 1.0) / (Math.exp(fp) - 1.0);
-          const val = prevVal + gp * (targetVal-prevVal);
+          let val = prevVal + gp * (targetVal-prevVal);
 
-          this.targetParam.linearRampToValueAtTime(decibelToLinear(val), startTime + currTimeNT*this.duration);
+          val = this.inDb ? decibelToLinear(val) : val;
+          this.targetParam.linearRampToValueAtTime(val, startTime + currTimeNT*this.duration);
         }
         //Last step
-        this.targetParam.linearRampToValueAtTime(decibelToLinear(targetVal), startTime + endTimeNT*this.duration);
+        targetVal = this.inDb ? decibelToLinear(targetVal) : targetVal;
+        this.targetParam.linearRampToValueAtTime(targetVal, startTime + endTimeNT*this.duration);
       } else {
         const transDurNT = endTimeNT-prevTimeNT;
         let currTimeNT = prevTimeNT;
@@ -58,10 +63,12 @@ export default class Enveloppe {
           const gp = (Math.exp(fp * gx) - 1.0) / (Math.exp(fp) - 1.0);
           const val = targetVal - gp*(targetVal-prevVal);
           
-          this.targetParam.linearRampToValueAtTime(decibelToLinear(val), startTime + currTimeNT*this.duration);
+          val = this.inDb ? decibelToLinear(val) : val;
+          this.targetParam.linearRampToValueAtTime(val, startTime + currTimeNT*this.duration);
         }
         //Last step
-        this.targetParam.linearRampToValueAtTime(decibelToLinear(targetVal), startTime + endTimeNT*this.duration);
+        targetVal = this.inDb ? decibelToLinear(targetVal) : targetVal;
+        this.targetParam.linearRampToValueAtTime(targetVal, startTime + endTimeNT*this.duration);
       }
     }
   }

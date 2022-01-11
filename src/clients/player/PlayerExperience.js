@@ -24,9 +24,6 @@ class PlayerExperience extends AbstractExperience {
     this.sync = this.require('sync');
     this.platform = this.require('platform');
 
-    
-    this.group = 1 + Math.floor(Math.random() * 6);
-
     renderInitializationScreens(client, config, $container);
   }
 
@@ -44,27 +41,38 @@ class PlayerExperience extends AbstractExperience {
     }
     this.globalMasterBus.connect(this.audioContext.destination);
     
+    this.activeNotes = new Set();
 
-    this.synthMasterControls = {};
+    // this.synthMasterControls = {};
     //State manager handling
     this.client.stateManager.observe(async (schemaName, stateId, nodeId) => {
-      if (schemaName == "masterControls") {
-        const synthControls = await this.client.stateManager.attach(schemaName, stateId);
-        const synthType = synthControls.get('synth');
-        this.synthMasterControls[synthType] = synthControls;
+      if (schemaName.includes("BusControls")) {
+        const synthType = schemaName.substring(0, schemaName.indexOf("BusControls"));
+        const groupControls = await this.client.stateManager.attach(schemaName, stateId);
+        
+        if (synthType === 'global') {
+          const initValues = groupControls.getValues();
+          for (const [key, value] of Object.entries(initValues)) {
+            this.globalMasterBus[key] = value;
+          }
 
-        synthControls.subscribe(updates => {
-          if (synthType === 'global') {
+          groupControls.subscribe(updates => {
             for (const [key, value] of Object.entries(updates)) {
               this.globalMasterBus[key] = value;
             }
+          });
+        } else {
+          const initValues = groupControls.getValues();
+          for (const [key, value] of Object.entries(initValues)) {
+            this.synthMasterBus[synthType][key] = value;
           }
-          else {
+
+          groupControls.subscribe(updates => {
             for (const [key, value] of Object.entries(updates)) {
               this.synthMasterBus[synthType][key] = value;
             }
-          }
-        });
+          });
+        }
       }
     });
 
@@ -82,20 +90,28 @@ class PlayerExperience extends AbstractExperience {
             const note = new Note(this.audioContext, updates.note[i]);
             note.connect(this.synthMasterBus[updates.note[i].metas.synthType].input);
             note.play(playTime);
+            this.activeNotes.add(note); //how/when to remove it ?
           }
 
         } else {
           const note = new Note(this.audioContext, updates.note);
           note.connect(this.synthMasterBus[updates.note.metas.synthType].input);
           note.play(playTime);
+          this.activeNotes.add(note);
         }
       }
     });
 
-    // const testSine = this.audioContext.createOscillator();
-    // testSine.type = 'square';
-    // testSine.connect(this.globalMasterBus.input);
-    // testSine.start();
+    this.score = await this.client.stateManager.attach('score');
+    this.score.subscribe(updates => {
+      if (updates.hasOwnProperty('transport')) {
+        if (updates.transport === 'stop') {
+          this.activeNotes.forEach(note => note.stop(this.audioContext.currentTime));
+          this.activeNotes.clear();   
+        }
+      }
+    });
+
 
 
     window.addEventListener('resize', () => this.render());

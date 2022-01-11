@@ -37,7 +37,7 @@ export default class Note {
         break;
     }
 
-    this.enveloppe = new Enveloppe(this.modGain.gain, this.duration, this.envBreakpoints);
+    this.enveloppe = new Enveloppe(this.modGain.gain, this.duration, this.envBreakpoints, true);
 
     this.synth.connect(this.modGain);
     this.modGain.connect(this.output);

@@ -126,28 +126,34 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
       if (updates.hasOwnProperty('notes')) {
         // console.log("note received", updates.notes.length);
         const dispatchStrategy = score.get('dispatchStrategy');
+        const syncTime = sync.getSyncTime() + 0.1;
         
         switch (dispatchStrategy) {
           case 'sendAll':
-            console.log('sendingNotes');
             players.forEach(playerState => {
-              playerState.set({ note: updates.notes, playTime: sync.getSyncTime() + 0.1 });
+              playerState.set({ note: updates.notes, playTime: syncTime });
             });    
             break;
           case 'randomSpread':
-            const nNotes = updates.notes.length;   
-            const nPlayers = playersIds.length;
-            const assignment = randomGrouping(nNotes, nPlayers);
-            players.forEach(playerState => {
-              const plId = playerState.get('id');
-              const idIdx = playersIds.indexOf(plId);
-              const plAssignment = assignment[idIdx];
-              const notesToSend = [];
-              for (let n of plAssignment) {
-                notesToSend.push(updates.notes[n]);
+            const nNotes = updates.notes.length;
+            const playersArray = Array.from(players);
+            shuffleArray(playersArray);
+
+            if (nNotes <= playersArray.length){  
+              let note = 0;
+              while (playersArray.length > 0) {
+                const player = playersArray.pop();
+                player.set({ note: updates.notes[note], playTime: syncTime });
+                note = (note + 1) % nNotes;
               }
-              playerState.set({ note: notesToSend, playTime: sync.getSyncTime() + 0.1 });
-            });  
+            } else {
+              let pl = 0;
+              for (let note = 0; note < nNotes; note++) {
+                const player = playersArray[pl];
+                player.set({ note: updates.notes[note], playTime: syncTime });
+                pl = (pl + 1)%playersArray.length;
+              }
+            }
             break;
         }
       }
@@ -163,6 +169,7 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
 function randomGrouping(nGroups, nPlayers) {
   const assignment = Array.from(new Array(nPlayers), () => []);
   if (nGroups <= nPlayers) {
+    // Mettre players dans un array et randomiser l'ordre puis ranger les premiers dans la première note etc
     const players = Array.from(Array(nPlayers).keys());
     let gp = 0;
     while (players.length > nPlayers%nGroups) {
@@ -191,9 +198,7 @@ function randomGrouping(nGroups, nPlayers) {
       assignment[pl].push(group);
       groups.splice(randomIdx, 1);
       pl = (pl + 1) % nPlayers;
-      console.log(assignment);
     }
-    console.log('second part');
     const players = Array.from(Array(nPlayers).keys());
     while (groups.length > 0) {
       const randomIdxPl = Math.floor(Math.random() * players.length);
@@ -203,10 +208,16 @@ function randomGrouping(nGroups, nPlayers) {
       assignment[player].push(group);
       players.splice(randomIdxPl, 1)  ;
       groups.splice(randomIdxGp, 1);
-      console.log(assignment);
     }
   }
   return assignment;
+}
+
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
 }
 
 process.on('unhandledRejection', (reason, p) => {

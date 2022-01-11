@@ -4,8 +4,13 @@ export default {
     default: [],
     event: true,
   },
+  transport: {
+    type: 'string',
+    default: '',
+    event: true,
+  },
   dispatchStrategy: {
     type: 'string',
-    default: 'sendAll',
+    default: 'randomSpread',
   }
 }

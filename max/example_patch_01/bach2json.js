@@ -32,12 +32,19 @@ Max.addHandler("parse", async () => {
   envelops = `[${envelops}]`;
   envelops = JSON5.parse(envelops);
 
+  let freqEnvelops = new String(dict.freqEnvelops);
+  freqEnvelops = freqEnvelops.replace(/"/g, '');
+  freqEnvelops = freqEnvelops.replace(/\[,/g, '[');
+  freqEnvelops = `[${freqEnvelops}]`;
+  freqEnvelops = JSON5.parse(freqEnvelops);
+
 
   const formatted = [];
 
   for (let i = 0; i < frequencies.length; i++) {
     const note = {
       frequency: frequencies[i],
+      freqEnveloppe: freqEnvelops[i],
       velocity: velocities[i],
       duration: durations[i],
       enveloppe: envelops[i],

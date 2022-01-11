@@ -4,11 +4,6 @@ export default {
     default: null,
     nullable: true,
   },
-  group: {
-    type: 'integer',
-    default: null,
-    nullable: true,
-  },
   note: {
     type: 'any',
     default: null,
