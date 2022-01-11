@@ -92,6 +92,10 @@ export default class AmSynth{
     this._offset.stop(time);
   }
 
+  get detune() {
+    return this._carrier.detune;
+  }
+
   set carrFreq(f) {
     this.userParams.carrFreq.value = f;
     const now = this.audioContext.currentTime;

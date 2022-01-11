@@ -7,6 +7,7 @@ export default class Note {
   constructor(audioContext, noteDictOsc) {
     this.audioContext = audioContext;
     this.frequency = noteDictOsc.frequency;
+    this.detuneBreakpoints = noteDictOsc.freqEnveloppe;
     this.velocity = noteDictOsc.velocity;
     this.duration = noteDictOsc.duration;
     this.envBreakpoints = noteDictOsc.enveloppe;
@@ -37,6 +38,7 @@ export default class Note {
         break;
     }
 
+    this.detuneEnveloppe = new Enveloppe(this.synth.detune, this.duration, this.detuneBreakpoints, false);
     this.enveloppe = new Enveloppe(this.modGain.gain, this.duration, this.envBreakpoints, true);
 
     this.synth.connect(this.modGain);
@@ -53,6 +55,7 @@ export default class Note {
   }
 
   start(time) {
+    this.detuneEnveloppe.apply(time);
     this.enveloppe.apply(time);
     this.synth.start(time);
   };
