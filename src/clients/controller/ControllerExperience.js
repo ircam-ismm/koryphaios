@@ -309,6 +309,48 @@ class ControllerExperience extends AbstractExperience {
           <h1 style="margin: 20px 0">${this.client.type} [id: ${this.client.id}]</h1>
         </div>
 
+        <!--Performance state-->
+        <p
+          style="
+            position: absolute;
+            top: 20px;
+            left: 320px;
+            font-size: medium;
+          "
+        >Performance state : </p>
+        <sc-button
+          style="
+            position: absolute;
+            top: 25px;
+            left: 520px;
+          "
+          width="200"
+          text="start performance"
+          @input="${e => this.score.set({ state: "playing" })}"
+        ></sc-button>
+        <sc-button
+          style="
+            position: absolute;
+            top: 25px;
+            left: 750px;
+          "
+          width="200"
+          text="end performance"
+          @input="${e => this.score.set({ state: "end" })}"
+        ></sc-button>
+        <sc-button
+          style="
+            position: absolute;
+            top: 25px;
+            left: 980px;
+          "
+          width="200"
+          text="waiting screen"
+          @input="${e => this.score.set({ state: "waiting" })}"
+        ></sc-button>
+
+
+
         <!--Note logger-->
         <div 
           style="
@@ -365,15 +407,24 @@ class ControllerExperience extends AbstractExperience {
               position: absolute;
               font-size: medium;
             "
-          >Note dispatch code: </p>
-          <sc-editor
+          >Dispatch strategy: </p>
+          <sc-button
             style="
               position: absolute;
               top: 14%;
             "
-            height=250
-            width=300
-          ></sc-editor>
+            text="send-all"
+            @input="${this.score.set({ dispatchStrategy: 'sendAll' })}"
+          ></sc-button>
+          <sc-button
+            style="
+              position: absolute;
+              top: 26%;
+            "
+            text="random-spread"
+            @input="${this.score.set({dispatchStrategy: 'randomSpread'})}"
+          ></sc-button>
+
         </div>
 
         <!--Global controls-->

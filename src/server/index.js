@@ -18,7 +18,7 @@ import PlayerExperience from './PlayerExperience.js';
 import ControllerExperience from './ControllerExperience.js';
 
 import getConfig from '../utils/getConfig.js';
-import player from './schemas/player.js';
+
 const ENV = process.env.ENV || 'default';
 const config = getConfig(ENV);
 const server = new Server();
@@ -76,7 +76,7 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
 
     const sync = server.pluginManager.get('sync');
 
-    const score = await server.stateManager.create('score');
+    const score = await server.stateManager.create('score', {piece: config.app.piece, composer: config.app.composer});
     const globalMasterControls = await server.stateManager.create('globalBusControls');
     const sineMasterControls = await server.stateManager.create('sineBusControls');
     const amMasterControls = await server.stateManager.create('amBusControls');

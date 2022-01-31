@@ -147,6 +147,10 @@ export default class MasterBus {
     this._output.connect(dest);
   }
 
+  disconnect() {
+    this._output.disconnect();
+  }
+
   hasPanner() {
     return this._hasPanner;
   }

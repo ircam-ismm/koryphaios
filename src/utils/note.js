@@ -38,8 +38,14 @@ export default class Note {
         break;
     }
 
-    this.detuneEnveloppe = new Enveloppe(this.synth.detune, this.duration, this.detuneBreakpoints, false);
-    this.enveloppe = new Enveloppe(this.modGain.gain, this.duration, this.envBreakpoints, true);
+    this.noDetuneEnveloppe = [[0,0,0],[0,1,0]]; 
+    if (this.detuneBreakpoints !== null && this.detuneBreakpoints !== this.noDetuneEnveloppe) {
+      this.detuneEnveloppe = new Enveloppe(this.synth.detune, this.duration, this.detuneBreakpoints, false);
+    }
+    if (this.envBreakpoints !== null) {
+      this.enveloppe = new Enveloppe(this.modGain.gain, this.duration, this.envBreakpoints, true);
+    }
+    
 
     this.synth.connect(this.modGain);
     this.modGain.connect(this.output);
@@ -55,8 +61,12 @@ export default class Note {
   }
 
   start(time) {
-    this.detuneEnveloppe.apply(time);
-    this.enveloppe.apply(time);
+    if (this.detuneBreakpoints !== null && this.detuneBreakpoints !== this.noDetuneEnveloppe) {
+      this.detuneEnveloppe.apply(time);
+    }
+    if (this.envBreakpoints !== null) {
+      this.enveloppe.apply(time);
+    }
     this.synth.start(time);
   };
 
