@@ -22,7 +22,7 @@ export default class PlayingScreen extends State {
             note.connect(this.context.synthMasterBus[updates.note[i].metas.synthType].input);
             note.play(playTime);
             activeNotes.add(note); //how/when to remove it ?
-            setTimeout(() => { activeNotes.delete(note) }, updates.note[i].duration*1000 + 500); //A regler
+            setTimeout(() => { activeNotes.delete(note) }, updates.note[i].duration*1000 + 500); // To fix
           }
 
         } else {

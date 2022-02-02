@@ -3,8 +3,7 @@ import { html } from 'lit-html';
 import '@ircam/simple-components/sc-button.js';
 import '@ircam/simple-components/sc-toggle.js';
 import '@ircam/simple-components/sc-slider.js';
-import FmSynth from '../../../utils/FmSynth.js';
-import GranularSynth from '../../../utils/GranularSynth.js';
+import GranularSynth from '../audioEngine/GranularSynth.js';
 
 export default class Playground extends State {
 

@@ -170,8 +170,16 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
                   modIndex: chord.modIndices[i], // mabe could have some default values there
                 };
               case 'sine':
-              default:
                 note['metas'] = { synthType: 'sine' };
+                break;
+              default:
+                const defaultSynth = score.get('defaultSynth');
+                if (defaultSynth in ['sine', 'fm', 'am', 'granular']) {// Put this list somewhere else in case we want to add more synth ? 
+                  note['metas'] = { synthType: defaultSynth };
+                }
+                else {
+                  note['metas'] = { synthType: 'sine' };
+                }
                 break;
             }
           } else {
