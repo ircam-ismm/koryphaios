@@ -1,6 +1,7 @@
 import 'source-map-support/register';
 import { Server } from '@soundworks/core/server';
 import path from 'path';
+import JSON5 from 'json5';
 import serveStatic from 'serve-static';
 import compile from 'template-literal';
 
@@ -76,7 +77,11 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
 
     const sync = server.pluginManager.get('sync');
 
-    const score = await server.stateManager.create('score', {piece: config.app.piece, composer: config.app.composer});
+    const score = await server.stateManager.create('score', {
+      piece: config.app.piece,
+      composer: config.app.composer,
+    });
+
     const globalMasterControls = await server.stateManager.create('globalBusControls');
     const sineMasterControls = await server.stateManager.create('sineBusControls');
     const amMasterControls = await server.stateManager.create('amBusControls');
@@ -85,48 +90,104 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
     const playerExperience = new PlayerExperience(server, 'player');
     const controllerExperience = new ControllerExperience(server, 'controller');
 
-    // start all the things
-    await server.start();
-    playerExperience.start();
-    controllerExperience.start();
-
-    const oscConfig = { // these are the defaults
-      localAddress: '0.0.0.0',
-      localPort: 57121,
-      remoteAddress: '127.0.0.1',
-      remotePort: 57122,
-    };
-    
-    const oscStateManager = new StateManagerOsc(server.stateManager, oscConfig);
-    await oscStateManager.init();
-
-    //Observe players connections
+    // observe players connections
     const players = new Set();
-    const playersIds = new Array();
 
     server.stateManager.observe(async (schemaName, stateId, nodeId) => {
       switch (schemaName) {
         case 'player':
           const playerState = await server.stateManager.attach(schemaName, stateId);
-          const plId = playerState.get('id');
+
           playerState.onDetach(() => {
-            // clean things
             players.delete(playerState);
-            playersIds.splice(playersIds.indexOf(plId), 1);
           });
+
           players.add(playerState);
-          playersIds.push(plId);
           break;
       }
     });
 
+    // hook to parse `notes` from raw `chord`
+    server.stateManager.registerUpdateHook('score', updates => {
+      if ('chord' in updates) {
+        const chord = updates.chord; // raw Max message
+        // format lisp like lists from Bach
+        for (let [key, value] of Object.entries(chord)) {
+          if (Array.isArray(value) && value[0] === '[') {
+            for (let i = 0; i < value.length - 1; i++) {
+              if (value[i] != '[' && value[i] != ',' && value[i + 1] !== ']') {
+                value.splice(i + 1, 0, ',');
+              }
+            }
 
-    //Receiving notes from Max by OSC
+            value = `[${value.join('')}]`;
+            chord[key] = JSON.parse(value);
+          } else if (!Array.isArray(value) && value !== null) {
+            // if single note in the chord, make it an array so we are generic after this point
+            chord[key] = [value];
+          }
+        }
+
+        const notes = []; // formatted notes
+        const numNotes = chord.frequencies.length;
+
+        for (let i = 0; i < numNotes; i++) {
+          // maybe could be more generic? e.g.:
+          // const note = {};
+          // for (let [key, value] of Object.entries(chord)) {
+          //   note[key] = value === null ? null : value[i];
+          // }
+          const note = {
+            frequency: chord.frequencies[i],
+            freqEnveloppe: chord.freqEnvelops[i],
+            velocity: chord.velocities[i],
+            duration: chord.durations[i],
+            enveloppe: chord.envelops[i],
+          };
+
+          if (Array.isArray(chord.synthTypes)) {
+            switch (chord.synthTypes[i]) {
+              case 'am':
+                note['metas'] = {
+                  synthType: 'am',
+                  modFreq: chord.modFreqs[i], // mabe could have some default values there
+                  modDepth: chord.modDepths[i], // mabe could have some default values there
+                };
+                break;
+              case 'fm':
+                note['metas'] = {
+                  synthType: 'fm',
+                  harmonicity: chord.harmonicities[i], // mabe could have some default values there
+                  modIndex: chord.modIndices[i], // mabe could have some default values there
+                };
+              case 'sine':
+              default:
+                note['metas'] = { synthType: 'sine' };
+                break;
+            }
+          } else {
+            note['metas'] = { synthType: 'sine' };
+          }
+
+          notes.push(note);
+        }
+
+        return {
+          notes,
+          ...updates,
+        };
+      }
+    });
+
     score.subscribe(async updates => {
       if (updates.hasOwnProperty('notes')) {
+        if (players.size === 0) {
+          return;
+        }
+
         // console.log("note received", updates.notes.length);
         const dispatchStrategy = score.get('dispatchStrategy');
-        const syncTime = sync.getSyncTime() + 0.1;
+        const syncTime = sync.getSyncTime() + 0;
         
         switch (dispatchStrategy) {
           case 'sendAll':
@@ -159,6 +220,20 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
       }
     });
 
+    // start all the things
+    await server.start();
+    playerExperience.start();
+    controllerExperience.start();
+
+    const oscConfig = { // these are the defaults
+      localAddress: '0.0.0.0',
+      localPort: 57121,
+      remoteAddress: '127.0.0.1',
+      remotePort: 57122,
+    };
+
+    const oscStateManager = new StateManagerOsc(server.stateManager, oscConfig);
+    await oscStateManager.init();
 
   } catch (err) {
     console.error(err.stack);
