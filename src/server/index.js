@@ -13,6 +13,8 @@ import busControlsSchema from './schemas/busControls.js';
 import pluginPlatformFactory from '@soundworks/plugin-platform/server';
 import pluginSyncFactory from '@soundworks/plugin-sync/server';
 import pluginCheckinFactory from '@soundworks/plugin-checkin/server';
+import pluginAudioBufferLoaderFactory from "@soundworks/plugin-audio-buffer-loader/server";
+import pluginFilesystemFactory from '@soundworks/plugin-filesystem/server';
 
 import PlayerExperience from './PlayerExperience.js';
 import ControllerExperience from './ControllerExperience.js';
@@ -29,6 +31,7 @@ server.templateDirectory = path.join('.build', 'server', 'tmpl');
 server.router.use(serveStatic('public'));
 server.router.use('build', serveStatic(path.join('.build', 'public')));
 server.router.use('vendors', serveStatic(path.join('.vendors', 'public')));
+server.router.use('soundbank', serveStatic('soundbank'));
 
 console.log(`
 --------------------------------------------------------
@@ -44,6 +47,15 @@ console.log(`
 server.pluginManager.register('platform', pluginPlatformFactory, {}, []);
 server.pluginManager.register('sync', pluginSyncFactory, {}, []);
 server.pluginManager.register('checkin', pluginCheckinFactory, {}, []);
+server.pluginManager.register('audio-buffer-loader', pluginAudioBufferLoaderFactory, {}, []);
+server.pluginManager.register('filesystem', pluginFilesystemFactory, {
+  directories: [{
+    name: 'soundbank',
+    path: 'soundbank',
+    publicDirectory: 'soundbank',
+  }],
+}, []);
+
 
 // -------------------------------------------------------------------
 // register schemas
@@ -77,10 +89,10 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
     const sync = server.pluginManager.get('sync');
 
     const score = await server.stateManager.create('score', {piece: config.app.piece, composer: config.app.composer});
-    const globalMasterControls = await server.stateManager.create('globalBusControls');
-    const sineMasterControls = await server.stateManager.create('sineBusControls');
-    const amMasterControls = await server.stateManager.create('amBusControls');
-    const fmMasterControls = await server.stateManager.create('fmBusControls');
+    const globalMasterControls = await server.stateManager.create('globalBusControls', {synthType: 'global'});
+    const sineMasterControls = await server.stateManager.create('sineBusControls', {synthType: 'sine'});
+    const amMasterControls = await server.stateManager.create('amBusControls', {synthType: 'am'});
+    const fmMasterControls = await server.stateManager.create('fmBusControls', {synthType: 'fm'});
 
     const playerExperience = new PlayerExperience(server, 'player');
     const controllerExperience = new ControllerExperience(server, 'controller');
@@ -102,20 +114,16 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
 
     //Observe players connections
     const players = new Set();
-    const playersIds = new Array();
 
     server.stateManager.observe(async (schemaName, stateId, nodeId) => {
       switch (schemaName) {
         case 'player':
           const playerState = await server.stateManager.attach(schemaName, stateId);
-          const plId = playerState.get('id');
           playerState.onDetach(() => {
             // clean things
             players.delete(playerState);
-            playersIds.splice(playersIds.indexOf(plId), 1);
           });
           players.add(playerState);
-          playersIds.push(plId);
           break;
       }
     });
@@ -126,7 +134,7 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
       if (updates.hasOwnProperty('notes')) {
         // console.log("note received", updates.notes.length);
         const dispatchStrategy = score.get('dispatchStrategy');
-        const syncTime = sync.getSyncTime() + 0.1;
+        const syncTime = sync.getSyncTime() + score.get('offsetSyncTime');
         
         switch (dispatchStrategy) {
           case 'sendAll':
@@ -137,7 +145,7 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
           case 'randomSpread':
             const nNotes = updates.notes.length;
             const playersArray = Array.from(players);
-            shuffleArray(playersArray);
+            playersArray.sort((a, b) => Math.random() < 0.5 ? 1 : -1)
 
             if (nNotes <= playersArray.length){  
               let note = 0;
@@ -166,59 +174,13 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
 })();
 
 
-function randomGrouping(nGroups, nPlayers) {
-  const assignment = Array.from(new Array(nPlayers), () => []);
-  if (nGroups <= nPlayers) {
-    // Mettre players dans un array et randomiser l'ordre puis ranger les premiers dans la première note etc
-    const players = Array.from(Array(nPlayers).keys());
-    let gp = 0;
-    while (players.length > nPlayers%nGroups) {
-      const randomIdx = Math.floor(Math.random() * players.length);
-      const player = players[randomIdx];
-      assignment[player].push(gp);
-      players.splice(randomIdx, 1);
-      gp = (gp + 1) % nGroups;
-    }
-    const groups = Array.from(Array(nGroups).keys());
-    while (players.length > 0) {
-      const randomIdxPl = Math.floor(Math.random() * players.length);
-      const randomIdxGp = Math.floor(Math.random() * groups.length);
-      const player = players[randomIdxPl];
-      const group = groups[randomIdxGp];
-      assignment[player].push(group);
-      players.splice(randomIdxPl, 1);
-      groups.splice(randomIdxGp, 1);
-    }
-  } else {
-    const groups = Array.from(Array(nGroups).keys());
-    let pl = 0;
-    while (groups.length > nGroups%nPlayers) {
-      const randomIdx = Math.floor(Math.random() * groups.length);
-      const group = groups[randomIdx];
-      assignment[pl].push(group);
-      groups.splice(randomIdx, 1);
-      pl = (pl + 1) % nPlayers;
-    }
-    const players = Array.from(Array(nPlayers).keys());
-    while (groups.length > 0) {
-      const randomIdxPl = Math.floor(Math.random() * players.length);
-      const randomIdxGp = Math.floor(Math.random() * groups.length);
-      const player = players[randomIdxPl];
-      const group = groups[randomIdxGp];
-      assignment[player].push(group);
-      players.splice(randomIdxPl, 1)  ;
-      groups.splice(randomIdxGp, 1);
-    }
-  }
-  return assignment;
-}
-
-function shuffleArray(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-}
+// Keep in case the other method doesn't work
+// function shuffleArray(array) {
+//   for (let i = array.length - 1; i > 0; i--) {
+//     const j = Math.floor(Math.random() * (i + 1));
+//     [array[i], array[j]] = [array[j], array[i]];
+//   }
+// }
 
 process.on('unhandledRejection', (reason, p) => {
   console.log('> Unhandled Promise Rejection');

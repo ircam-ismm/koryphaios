@@ -18,6 +18,14 @@ export default {
     default: 'waiting',
     nullable: true,
   },
+  defaultSynth: {
+    type: 'string',
+    default: 'sine',
+  },
+  offsetSyncTime: {
+    type: 'float',
+    default: 0.1,
+  },
   piece: {
     type: 'string',
     default: null,

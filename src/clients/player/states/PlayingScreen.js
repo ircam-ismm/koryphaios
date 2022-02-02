@@ -1,7 +1,7 @@
 import State from './State.js';
 import { html } from 'lit-html';
 import '@ircam/simple-components/sc-button.js';
-import Note from '../../../utils/note.js';
+import Note from '../audioEngine/Note.js';
 
 export default class PlayingScreen extends State {
 
@@ -11,7 +11,7 @@ export default class PlayingScreen extends State {
 
     const activeNotes = new Set();
 
-    this.context.playerState.subscribe(updates => {
+    this.playerStateUnsubscribe = this.context.playerState.subscribe(updates => {
       if (updates.hasOwnProperty('note')) {
         console.log('received note :', updates.note);
         const playTime = this.context.sync.getLocalTime(updates.playTime)
@@ -22,6 +22,7 @@ export default class PlayingScreen extends State {
             note.connect(this.context.synthMasterBus[updates.note[i].metas.synthType].input);
             note.play(playTime);
             activeNotes.add(note); //how/when to remove it ?
+            setTimeout(() => { activeNotes.delete(note) }, updates.note[i].duration*1000 + 500); //A regler
           }
 
         } else {
@@ -29,11 +30,12 @@ export default class PlayingScreen extends State {
           note.connect(this.context.synthMasterBus[updates.note.metas.synthType].input);
           note.play(playTime);
           activeNotes.add(note);
+          setTimeout(() => { activeNotes.delete(note) }, updates.note.duration*1000 + 500);
         }
       }
     });
 
-    this.context.score.subscribe(updates => {
+    this.scoreUnsubscribe = this.context.score.subscribe(updates => {
       if (updates.hasOwnProperty('transport')) {
         if (updates.transport === 'stop') {
           activeNotes.forEach(note => note.stop(this.context.audioContext.currentTime));
@@ -47,6 +49,8 @@ export default class PlayingScreen extends State {
   }
 
   async exit() {
+    this.playerStateUnsubscribe();
+    this.scoreUnsubscribe();
     this.context.globalMasterBus.disconnect();
   }
 

@@ -3,6 +3,7 @@ import Test from "./Test";
 import WaitingScreen from "./WaitingScreen";
 import PlayingScreen from "./playingScreen";
 import EndScreen from "./EndScreen";
+import Playground from "./Playground";
 
 const states = {
   'welcome-screen': WelcomeScreen,
@@ -10,6 +11,7 @@ const states = {
   'waiting': WaitingScreen,
   'playing': PlayingScreen,
   'end': EndScreen,
+  'playground': Playground,
 };
 
 class StateMachine {

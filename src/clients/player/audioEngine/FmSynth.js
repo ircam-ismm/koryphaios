@@ -1,10 +1,4 @@
-/* 
-- mieux ecrire param par defaut ?
-- check si c'est la meme implémentation que dans la v1
-*/
-
-
-export default class AmSynth{
+export default class FmSynth{
   constructor(audioContext) {
     this.audioContext = audioContext;
 
@@ -20,7 +14,7 @@ export default class AmSynth{
         default: 'sine',
         value: 'sine',
       },
-      modFreq: {
+      harmonicity: {
         type: 'number',
         default: 1.0,
         value: 1.0,
@@ -30,7 +24,7 @@ export default class AmSynth{
         default: 'sine',
         value: 'sine',
       },
-      modDepth: {
+      modIndex: {
         type: 'number',
         min: 0.0,
         max: 1.0,
@@ -44,27 +38,17 @@ export default class AmSynth{
     this._carrier.frequency.value = this.userParams.carrFreq.default;
     this._carrier.type = this.userParams.carrType.default;
     this._modulator = this.audioContext.createOscillator();
-    this._modulator.frequency.value = this.userParams.modFreq.default;
+    this._modulator.frequency.value = this.userParams.carrFreq.default*this.userParams.harmonicity.default;
     this._modulator.type = this.userParams.modType.default;
-    this._depth = this.audioContext.createGain();
-    this._depth.gain.value = this.userParams.modDepth.default;
-    this._offset = this.audioContext.createConstantSource();
-    this._offset.offset.value = 1 - this.userParams.modDepth.default;
-    this._scale = this.audioContext.createGain();
-    this._scale.gain.value = 0.5;
-    this._gain = this.audioContext.createGain();
+    this._modAmp = this.audioContext.createGain();
+    this._modAmp.gain.value = 0.0;
     this._output = this.audioContext.createGain();
 
-    this.modDepth = 0;
-
     //Connections
-    this._carrier.connect(this._gain);
-    this._gain.connect(this._output);
-    
-    this._modulator.connect(this._depth);
-    this._depth.connect(this._scale);
-    this._offset.connect(this._scale);
-    this._scale.connect(this._gain.gain);
+    this._carrier.connect(this._output);
+
+    this._modulator.connect(this._modAmp);
+    this._modAmp.connect(this._carrier.frequency);
 
     //getters
     // Object.keys(this.userParams).forEach(key => {
@@ -83,13 +67,11 @@ export default class AmSynth{
   start(time) {
     this._carrier.start(time);
     this._modulator.start(time);
-    this._offset.start(time);
   }
 
   stop(time) {
     this._carrier.stop(time);
     this._modulator.stop(time);
-    this._offset.stop(time);
   }
 
   get detune() {
@@ -99,6 +81,8 @@ export default class AmSynth{
   set carrFreq(f) {
     this.userParams.carrFreq.value = f;
     const now = this.audioContext.currentTime;
+    this.modIndex = this.userParams.modIndex.value;
+    this.harmonicity = this.userParams.harmonicity.value;
     this._carrier.frequency.setTargetAtTime(f, now, 0.01);
   }
 
@@ -107,10 +91,12 @@ export default class AmSynth{
     this._carrier.type = type;
   }
 
-  set modFreq(f) {
-    this.userParams.modFreq.value = f;
+  set harmonicity(r) {
+    this.userParams.harmonicity.value = r;
     const now = this.audioContext.currentTime;
-    this._modulator.frequency.setTargetAtTime(f, now, 0.01);
+    const carrFreq = this.userParams.carrFreq.value;
+    this.modIndex = this.userParams.modIndex.value; //update
+    this._modulator.frequency.setTargetAtTime(carrFreq*r, now, 0.01);
   }
 
   set modType(type) {
@@ -118,11 +104,12 @@ export default class AmSynth{
     this._modulator.type = type;
   }
 
-  set modDepth(depth) {
-    this.userParams.modDepth.value = depth;
+  set modIndex(val) {
+    this.userParams.modIndex.value = val;
     const now = this.audioContext.currentTime;
-    this._depth.gain.setTargetAtTime(depth, now, 0.01);
-    this._offset.offset.setTargetAtTime(1-depth, now, 0.01);
+    const carrFreq = this.userParams.carrFreq.value;
+    const harmonicity = this.userParams.harmonicity.value;
+    this._modAmp.gain.setTargetAtTime(carrFreq*harmonicity*val, now, 0.01);
   }
 
 }

@@ -6,11 +6,15 @@ export default class WaitingScreen extends State {
 
 
   async enter() {
-    this.context.score.subscribe(updates => {
+    this.scoreUnsubscribe = this.context.score.subscribe(updates => {
       if (updates.hasOwnProperty('state')){
         this.context.playerState.set({ state: updates.state });
       }
     });
+  }
+
+  async exit() {
+    this.scoreUnsubscribe();
   }
 
   render() {

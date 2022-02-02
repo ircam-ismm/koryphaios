@@ -1,6 +1,6 @@
-import FmSynth from "./fmSynth.js";
-import AmSynth from "./amSynth.js";
-import Enveloppe from "./enveloppe.js";
+import FmSynth from "./FmSynth.js";
+import AmSynth from "./AmSynth.js";
+import Enveloppe from "./Enveloppe.js";
 import decibelToLinear from "../math/decibelToLinear.js";
 
 export default class Note {
@@ -39,10 +39,10 @@ export default class Note {
     }
 
     this.noDetuneEnveloppe = [[0,0,0],[0,1,0]]; 
-    if (this.detuneBreakpoints !== null && this.detuneBreakpoints !== this.noDetuneEnveloppe) {
+    if (this.detuneBreakpoints !== null && this.detuneBreakpoints !== undefined && this.detuneBreakpoints !== this.noDetuneEnveloppe) {
       this.detuneEnveloppe = new Enveloppe(this.synth.detune, this.duration, this.detuneBreakpoints, false);
     }
-    if (this.envBreakpoints !== null) {
+    if (this.envBreakpoints !== null && this.envBreakpoints !== undefined ) {
       this.enveloppe = new Enveloppe(this.modGain.gain, this.duration, this.envBreakpoints, true);
     }
     
@@ -61,10 +61,10 @@ export default class Note {
   }
 
   start(time) {
-    if (this.detuneBreakpoints !== null && this.detuneBreakpoints !== this.noDetuneEnveloppe) {
+    if (this.detuneBreakpoints !== null && this.detuneBreakpoints !== undefined && this.detuneBreakpoints !== this.noDetuneEnveloppe) {
       this.detuneEnveloppe.apply(time);
     }
-    if (this.envBreakpoints !== null) {
+    if (this.envBreakpoints !== null && this.envBreakpoints !== undefined ) {
       this.enveloppe.apply(time);
     }
     this.synth.start(time);

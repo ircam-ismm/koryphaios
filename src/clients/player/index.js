@@ -8,6 +8,8 @@ import PlayerExperience from './PlayerExperience.js';
 import pluginPlatformFactory from '@soundworks/plugin-platform/client';
 import pluginSyncFactory from '@soundworks/plugin-sync/client';
 import pluginCheckinFactory from '@soundworks/plugin-checkin/client';
+import pluginAudioBufferLoaderFactory from '@soundworks/plugin-audio-buffer-loader/client';
+import pluginFilesystemFactory from '@soundworks/plugin-filesystem/client';
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioContext = new AudioContext();
@@ -33,6 +35,8 @@ async function launch($container, index) {
     }, []);
     client.pluginManager.register('sync', pluginSyncFactory, {}, []);
     client.pluginManager.register('checkin', pluginCheckinFactory, {}, []);
+    client.pluginManager.register('audio-buffer-loader', pluginAudioBufferLoaderFactory, {}, []);
+    client.pluginManager.register('filesystem', pluginFilesystemFactory, {}, []);
     // -------------------------------------------------------------------
     // launch application
     // -------------------------------------------------------------------
