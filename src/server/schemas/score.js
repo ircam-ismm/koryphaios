@@ -1,4 +1,11 @@
 export default {
+  // raw chord as send by Max (need some parsing)
+  chord: {
+    type: 'any',
+    default: [],
+    event: true,
+  },
+  // parsed chord
   notes: {
     type: 'any',
     default: [],
