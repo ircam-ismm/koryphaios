@@ -35,7 +35,7 @@ export default class MasterBus {
       volume: {
         type: 'number',
         min: -60.0,
-        max: 0.0,
+        max: 12.0,
         default: -6.0,
         value: -6.0,
       },

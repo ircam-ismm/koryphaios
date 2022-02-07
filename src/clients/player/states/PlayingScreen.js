@@ -13,18 +13,20 @@ export default class PlayingScreen extends State {
 
     this.playerStateUnsubscribe = this.context.playerState.subscribe(updates => {
       if (updates.hasOwnProperty('note')) {
-        console.log('received note:', updates.note);
+        console.log('received note zeqzeqze:', updates.note);
         const playTime = this.context.sync.getLocalTime(updates.playTime);
-        // console.log('playtime: ', playTime);
-        // alert(playTime);
-        //play note or chords;
+        console.log(updates.playTime, playTime);
+
         if (Array.isArray(updates.note)) {
           for (let i = 0; i < updates.note.length; i++) {
             const note = new Note(this.context.audioContext, updates.note[i]);
             note.connect(this.context.synthMasterBus[updates.note[i].metas.synthType].input);
             note.play(playTime);
             activeNotes.add(note); //how/when to remove it ?
-            setTimeout(() => { activeNotes.delete(note) }, updates.note[i].duration*1000 + 500); // To fix
+
+            // setTimeout(() => {
+            //   activeNotes.delete(note)
+            // }, updates.note[i].duration*1000 + 500); // To fix
           }
 
         } else {
@@ -32,7 +34,10 @@ export default class PlayingScreen extends State {
           note.connect(this.context.synthMasterBus[updates.note.metas.synthType].input);
           note.play(playTime);
           activeNotes.add(note);
-          setTimeout(() => { activeNotes.delete(note) }, updates.note.duration*1000 + 500);
+
+          // setTimeout(() => {
+          //     activeNotes.delete(note)
+          // }, updates.note.duration*1000 + 500);
         }
       }
     });

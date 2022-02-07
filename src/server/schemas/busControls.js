@@ -11,7 +11,7 @@ export default {
   volume: {
     type: 'float',
     min: -60.,
-    max: 0.,
+    max: 12.,
     default: 0.,
   },
   lowPassFreq: {
