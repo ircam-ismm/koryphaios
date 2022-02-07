@@ -1,13 +1,13 @@
 import { AbstractExperience } from '@soundworks/core/client';
-import { render, html } from 'lit-html';
+import { render, html, nothing } from 'lit-html';
 import renderInitializationScreens from '@soundworks/template-helpers/client/render-initialization-screens.js';
-import Note from '../../utils/note';
-import MasterBus from '../../utils/masterBus';
+import MasterBus from './audioEngine/MasterBus';
+import StateMachine from './states/StateMachine.js';
 
 /*
 TODO : 
 
-- Enveloppe : differencier decibel/linéaire
+- Enveloppe : !! difference between decibel/linear
 */
 
 class PlayerExperience extends AbstractExperience {
@@ -23,12 +23,34 @@ class PlayerExperience extends AbstractExperience {
     this.checkin = this.require('checkin');
     this.sync = this.require('sync');
     this.platform = this.require('platform');
+    this.audioBufferLoader = this.require('audio-buffer-loader');
+    this.filesystem = this.require('filesystem');
 
     renderInitializationScreens(client, config, $container);
   }
 
   async start() {
     super.start();
+
+    this.stateMachine = new StateMachine(this);
+
+    this.playerState = await this.client.stateManager.create('player', { group: this.group });
+    this.score = await this.client.stateManager.attach('score');
+
+    this.playerState.subscribe(async updates => {
+      if ('state' in updates) {
+        this.stateMachine.setState(updates.state);
+      }
+      this.render();
+    });
+
+    //Filesystem for samples
+    this.filesystem.subscribe(() => this.loadSoundbank());
+    await this.loadSoundbank();
+    // const loadedData = await this.audioBufferLoader.load({
+    //   'drum-loop': 'samples/drum-loop.wav',
+    // }, true);
+
 
     //Audio pipeline
     this.globalMasterBus = new MasterBus(this.audioContext, { panner: false, filter: true});
@@ -39,16 +61,14 @@ class PlayerExperience extends AbstractExperience {
       this.synthMasterBus[synthType] = new MasterBus(this.audioContext, { panner: false, filter: true });
       this.synthMasterBus[synthType].connect(this.globalMasterBus.input);
     }
-    this.globalMasterBus.connect(this.audioContext.destination);
-    
-    this.activeNotes = new Set();
+    // this.globalMasterBus.connect(this.audioContext.destination);
 
-    // this.synthMasterControls = {};
-    //State manager handling
+    this.synthMasterControls = {};
+    // //State manager handling
     this.client.stateManager.observe(async (schemaName, stateId, nodeId) => {
       if (schemaName.includes("BusControls")) {
-        const synthType = schemaName.substring(0, schemaName.indexOf("BusControls"));
         const groupControls = await this.client.stateManager.attach(schemaName, stateId);
+        const synthType = groupControls.get('synthType');
         
         if (synthType === 'global') {
           const initValues = groupControls.getValues();
@@ -75,60 +95,44 @@ class PlayerExperience extends AbstractExperience {
         }
       }
     });
-
-    this.playerState = await this.client.stateManager.create('player', { group: this.group });
+  
     await this.playerState.set({ id: this.checkin.get('index')});
-    console.log('checkin id :', this.playerState.get('id'));  
-
-    this.playerState.subscribe(updates => {
-      if (updates.hasOwnProperty('note')) {
-        console.log('received note :', updates.note);
-        const playTime = this.sync.getLocalTime(updates.playTime)
-        //play note or chords;
-        if (Array.isArray(updates.note)) {
-          for (let i = 0; i < updates.note.length; i++) {
-            const note = new Note(this.audioContext, updates.note[i]);
-            note.connect(this.synthMasterBus[updates.note[i].metas.synthType].input);
-            note.play(playTime);
-            this.activeNotes.add(note); //how/when to remove it ?
-          }
-
-        } else {
-          const note = new Note(this.audioContext, updates.note);
-          note.connect(this.synthMasterBus[updates.note.metas.synthType].input);
-          note.play(playTime);
-          this.activeNotes.add(note);
-        }
-      }
-    });
-
-    this.score = await this.client.stateManager.attach('score');
-    this.score.subscribe(updates => {
-      if (updates.hasOwnProperty('transport')) {
-        if (updates.transport === 'stop') {
-          this.activeNotes.forEach(note => note.stop(this.audioContext.currentTime));
-          this.activeNotes.clear();   
-        }
-      }
-    });
 
 
+    if (this.score.get('concertMode')) {
+      this.playerState.set({ state: 'test' });
+    } else {
+      this.playerState.set({ state: 'playing' });
+    }
 
     window.addEventListener('resize', () => this.render());
     this.render();
   }
 
-  render() {
-    // debounce with requestAnimationFrame
-    window.cancelAnimationFrame(this.rafId);
+  async loadSoundbank() {
+    const soundbankTree = this.filesystem.get('soundbank');
+    // format tree to create a simple data object
+    const defObj = {};
 
-    this.rafId = window.requestAnimationFrame(() => {
-      render(html`
-        <div style="padding: 20px">
-          <h1 style="margin: 20px 0">${this.client.type} [id: ${this.client.id}]</h1>
-        </div>
-      `, this.$container);
+    soundbankTree.children.forEach(leaf => {
+      if (leaf.type === 'file') {
+        defObj[leaf.name] = leaf.url;
+      }
     });
+    // load files and clear old cached buffers
+    const loadedObject = await this.audioBufferLoader.load(defObj, true);
+    // do something with your buffers
+  }
+
+  render() {
+    render(html`
+      <div class="main">
+        ${this.stateMachine.state ?
+        this.stateMachine.state.render() :
+        nothing
+      }
+      </div>
+    `, this.$container);
   }
 }
 

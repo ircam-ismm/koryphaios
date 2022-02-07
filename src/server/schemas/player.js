@@ -4,6 +4,11 @@ export default {
     default: null,
     nullable: true,
   },
+  state: {
+    type: 'string',
+    default: null,
+    nullable: true,
+  },
   note: {
     type: 'any',
     default: null,

@@ -1,10 +1,4 @@
-/* 
-- mieux ecrire param par defaut ?
-- check si c'est la meme implémentation que dans la v1
-*/
-
-
-export default class AmSynth{
+export default class AmSynth {
   constructor(audioContext) {
     this.audioContext = audioContext;
 
