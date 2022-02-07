@@ -27,8 +27,9 @@ export default {
   },
   'randomPoint': (players, notes, syncTime) => {
     const playersArray = Array.from(players);
-    const randIdx = Math.floor(Math.random() * players.length);
+    const randIdx = Math.floor(Math.random() * playersArray.length);
     const player = playersArray[randIdx];
+    console.log(randIdx, playersArray.length);
     player.set({ note: notes, playTime: syncTime });
   },
 }
