@@ -414,7 +414,7 @@ class ControllerExperience extends AbstractExperience {
               top: 14%;
             "
             text="send-all"
-            @input="${this.score.set({ dispatchStrategy: 'sendAll' })}"
+            @input="${e => this.score.set({ dispatchStrategy: 'sendAll' })}"
           ></sc-button>
           <sc-button
             style="
@@ -422,7 +422,7 @@ class ControllerExperience extends AbstractExperience {
               top: 26%;
             "
             text="random-spread"
-            @input="${this.score.set({dispatchStrategy: 'randomSpread'})}"
+            @input="${e => this.score.set({dispatchStrategy: 'randomSpread'})}"
           ></sc-button>
 
         </div>
