@@ -1,4 +1,4 @@
-export default class FmSynth{
+export default class FmSynth {
   constructor(audioContext) {
     this.audioContext = audioContext;
 

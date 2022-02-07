@@ -16,6 +16,8 @@ export default class Note {
     this.output = this.audioContext.createGain();
     this.output.gain.value = decibelToLinear(this.velocity);
     this.modGain = this.audioContext.createGain();
+    this.clickEnv = this.audioContext.createGain();
+    this.clickEnv.gain.value = 0;
 
     switch (this.metas.synthType) {
       case 'sine':
@@ -48,7 +50,8 @@ export default class Note {
     
 
     this.synth.connect(this.modGain);
-    this.modGain.connect(this.output);
+    this.modGain.connect(this.clickEnv);
+    this.clickEnv.connect(this.output);
   }
 
   connect(dest) {
@@ -67,6 +70,8 @@ export default class Note {
     if (this.envBreakpoints !== null && this.envBreakpoints !== undefined ) {
       this.enveloppe.apply(time);
     }
+    this.clickEnv.gain.setValueAtTime(0, time);
+    this.clickEnv.gain.linearRampToValueAtTime(1, time + 0.01);
     this.synth.start(time);
   };
 

@@ -20,6 +20,10 @@ export default {
     type: 'string',
     default: 'randomSpread',
   },
+  concertMode: {
+    type: 'boolean',
+    default: false,
+  },
   state: {
     type: 'string',
     default: 'waiting',

@@ -20,6 +20,8 @@ import pluginFilesystemFactory from '@soundworks/plugin-filesystem/server';
 import PlayerExperience from './PlayerExperience.js';
 import ControllerExperience from './ControllerExperience.js';
 
+import dispatchStrategies from '../utils/dispatchStrategies.js';
+
 import getConfig from '../utils/getConfig.js';
 
 const ENV = process.env.ENV || 'default';
@@ -91,7 +93,9 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
 
     const score = await server.stateManager.create('score', {
       piece: config.app.piece, 
-      composer: config.app.composer});
+      composer: config.app.composer,
+      concertMode: false,
+    });
     const globalMasterControls = await server.stateManager.create('globalBusControls', {synthType: 'global'});
     const sineMasterControls = await server.stateManager.create('sineBusControls', {synthType: 'sine'});
     const amMasterControls = await server.stateManager.create('amBusControls', {synthType: 'am'});
@@ -201,39 +205,11 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
         if (players.size === 0) {
           return;
         }
-
         // console.log("note received", updates.notes.length);
         const dispatchStrategy = score.get('dispatchStrategy');
         const syncTime = sync.getSyncTime() + score.get('offsetSyncTime');
-        
-        switch (dispatchStrategy) {
-          case 'sendAll':
-            players.forEach(playerState => {
-              playerState.set({ note: updates.notes, playTime: syncTime });
-            });    
-            break;
-          case 'randomSpread':
-            const nNotes = updates.notes.length;
-            const playersArray = Array.from(players);
-            playersArray.sort((a, b) => Math.random() < 0.5 ? 1 : -1)
-
-            if (nNotes <= playersArray.length){  
-              let note = 0;
-              while (playersArray.length > 0) {
-                const player = playersArray.pop();
-                player.set({ note: updates.notes[note], playTime: syncTime });
-                note = (note + 1) % nNotes;
-              }
-            } else {
-              let pl = 0;
-              for (let note = 0; note < nNotes; note++) {
-                const player = playersArray[pl];
-                player.set({ note: updates.notes[note], playTime: syncTime });
-                pl = (pl + 1)%playersArray.length;
-              }
-            }
-            break;
-        }
+        const dispatchFunc = dispatchStrategies[dispatchStrategy];
+        dispatchFunc(players, updates.notes, syncTime);
       }
     });
 

@@ -4,8 +4,6 @@ import renderInitializationScreens from '@soundworks/template-helpers/client/ren
 import MasterBus from './audioEngine/MasterBus';
 import StateMachine from './states/StateMachine.js';
 
-const SKIP_SOUND_TEST = true;
-
 /*
 TODO : 
 
@@ -101,10 +99,10 @@ class PlayerExperience extends AbstractExperience {
     await this.playerState.set({ id: this.checkin.get('index')});
 
 
-    if (SKIP_SOUND_TEST) {
-      this.playerState.set({ state: 'playground' });
-    } else {
+    if (this.score.get('concertMode')) {
       this.playerState.set({ state: 'test' });
+    } else {
+      this.playerState.set({ state: 'playing' });
     }
 
     window.addEventListener('resize', () => this.render());

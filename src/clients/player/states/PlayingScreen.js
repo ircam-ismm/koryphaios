@@ -13,8 +13,10 @@ export default class PlayingScreen extends State {
 
     this.playerStateUnsubscribe = this.context.playerState.subscribe(updates => {
       if (updates.hasOwnProperty('note')) {
-        console.log('received note :', updates.note);
-        const playTime = this.context.sync.getLocalTime(updates.playTime)
+        console.log('received note:', updates.note);
+        const playTime = this.context.sync.getLocalTime(updates.playTime);
+        // console.log('playtime: ', playTime);
+        // alert(playTime);
         //play note or chords;
         if (Array.isArray(updates.note)) {
           for (let i = 0; i < updates.note.length; i++) {
