@@ -1,9 +1,9 @@
-import WelcomeScreen from "./WelcomeScreen";
-import Test from "./Test";
-import WaitingScreen from "./WaitingScreen";
-import PlayingScreen from "./playingScreen";
-import EndScreen from "./EndScreen";
-import Playground from "./Playground";
+import WelcomeScreen from './WelcomeScreen.js';
+import Test from './Test.js';
+import WaitingScreen from './WaitingScreen.js';
+import PlayingScreen from './playingScreen.js';
+import EndScreen from './EndScreen.js';
+import Playground from './Playground.js';
 
 const states = {
   'welcome-screen': WelcomeScreen,
