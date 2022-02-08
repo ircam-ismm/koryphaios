@@ -213,6 +213,12 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
       }
     });
 
+    score.subscribe(async updates => {
+      if (updates.hasOwnProperty('defaultSynth')) {
+        console.log(updates.defaultSynth);
+      }
+    });
+
     // start all the things
     await server.start();
     playerExperience.start();
