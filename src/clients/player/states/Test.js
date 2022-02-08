@@ -3,8 +3,7 @@ import { html } from 'lit-html';
 import '@ircam/simple-components/sc-button.js';
 
 export default class Test extends State {
-
-  playTestSound() {
+  playTestSound() {
     const osc = this.context.audioContext.createOscillator();
     const gain = this.context.audioContext.createGain();
     

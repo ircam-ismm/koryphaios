@@ -1,5 +1,5 @@
 export default {
-  synthType: {
+  name: {
     type: 'string',
     default: null,
     nullable: true,

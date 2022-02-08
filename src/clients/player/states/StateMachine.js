@@ -1,7 +1,7 @@
 import WelcomeScreen from './WelcomeScreen.js';
 import Test from './Test.js';
 import WaitingScreen from './WaitingScreen.js';
-import PlayingScreen from './playingScreen.js';
+import PlayingScreen from './PlayingScreen.js';
 import EndScreen from './EndScreen.js';
 import Playground from './Playground.js';
 

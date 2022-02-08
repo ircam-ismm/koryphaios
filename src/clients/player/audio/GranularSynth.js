@@ -51,9 +51,11 @@ export default class GranularSynth {
   }
   
   start(time) {
+
   }
 
   stop(time) {
+
   }
 
   set period(f) {

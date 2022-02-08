@@ -3,18 +3,12 @@ import { html } from 'lit-html';
 import '@ircam/simple-components/sc-button.js';
 
 export default class WaitingScreen extends State {
-
-
   async enter() {
-    this.scoreUnsubscribe = this.context.score.subscribe(updates => {
-      if (updates.hasOwnProperty('state')){
-        this.context.playerState.set({ state: updates.state });
-      }
-    });
+    await super.enter();
   }
 
   async exit() {
-    this.scoreUnsubscribe();
+    await super.exit();
   }
 
   render() {

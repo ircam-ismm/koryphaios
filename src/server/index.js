@@ -20,7 +20,7 @@ import pluginFilesystemFactory from '@soundworks/plugin-filesystem/server';
 import PlayerExperience from './PlayerExperience.js';
 import ControllerExperience from './ControllerExperience.js';
 
-import dispatchStrategies from '../utils/dispatchStrategies.js';
+import dispatchStrategies from './dispatchStrategies.js';
 
 import getConfig from '../utils/getConfig.js';
 
@@ -96,10 +96,10 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
       composer: config.app.composer,
       concertMode: false,
     });
-    const globalMasterControls = await server.stateManager.create('globalBusControls', {synthType: 'global'});
-    const sineMasterControls = await server.stateManager.create('sineBusControls', {synthType: 'sine'});
-    const amMasterControls = await server.stateManager.create('amBusControls', {synthType: 'am'});
-    const fmMasterControls = await server.stateManager.create('fmBusControls', {synthType: 'fm'});
+    const globalMasterControls = await server.stateManager.create('globalBusControls', { name: 'global' });
+    const sineMasterControls = await server.stateManager.create('sineBusControls', { name: 'sine' });
+    const amMasterControls = await server.stateManager.create('amBusControls', { name: 'am' });
+    const fmMasterControls = await server.stateManager.create('fmBusControls', { name: 'fm' });
 
     const playerExperience = new PlayerExperience(server, 'player');
     const controllerExperience = new ControllerExperience(server, 'controller');
@@ -116,6 +116,23 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
           });
 
           players.add(playerState);
+
+          // for testing
+          // setTimeout(() => {
+          //   playerState.set({ notes: [{
+          //     frequency: 285.30470202322215,
+          //     detune: [ [0, 0, 0], [1, 1200, 0] ],
+          //     velocity: -4.691440024499614,
+          //     duration: 2.984859375046442,
+          //     // envelop: null,
+          //     envelope: [ [0, -80, 0], [0.1, 0, 0], [1., -80, 0.] ],
+          //     synthType: null,
+          //     amModFreq: null,
+          //     amModDepths: null,
+          //     fmHarmonicity: 18.01399230969316,
+          //     fmModIndex: 4.206996917774388
+          //   }]});
+          // }, 1000);
           break;
       }
     });
@@ -142,52 +159,21 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
         }
 
         const notes = []; // formatted notes
-        const numNotes = chord.frequencies.length;
+        let numNotes = null;
+        // find first array in list
+        for (let name in chord) {
+          if (Array.isArray(chord[name])) {
+            numNotes = chord[name].length;
+            break;
+          }
+        }
 
         for (let i = 0; i < numNotes; i++) {
           // maybe could be more generic? e.g.:
-          // const note = {};
-          // for (let [key, value] of Object.entries(chord)) {
-          //   note[key] = value === null ? null : value[i];
-          // }
-          const note = {
-            frequency: chord.frequencies[i],
-            freqEnveloppe: chord.freqEnvelops[i],
-            velocity: chord.velocities[i],
-            duration: chord.durations[i],
-            enveloppe: chord.envelops[i],
-          };
+          const note = {};
 
-          if (Array.isArray(chord.synthTypes)) {
-            switch (chord.synthTypes[i]) {
-              case 'am':
-                note['metas'] = {
-                  synthType: 'am',
-                  modFreq: chord.modFreqs[i], // mabe could have some default values there
-                  modDepth: chord.modDepths[i], // mabe could have some default values there
-                };
-                break;
-              case 'fm':
-                note['metas'] = {
-                  synthType: 'fm',
-                  harmonicity: chord.harmonicities[i], // mabe could have some default values there
-                  modIndex: chord.modIndices[i], // mabe could have some default values there
-                };
-              case 'sine':
-                note['metas'] = { synthType: 'sine' };
-                break;
-              default:
-                const defaultSynth = score.get('defaultSynth');
-                if (defaultSynth in ['sine', 'fm', 'am', 'granular']) {// Put this list somewhere else in case we want to add more synth ? 
-                  note['metas'] = { synthType: defaultSynth };
-                }
-                else {
-                  note['metas'] = { synthType: 'sine' };
-                }
-                break;
-            }
-          } else {
-            note['metas'] = { synthType: 'sine' };
+          for (let [key, value] of Object.entries(chord)) {
+            note[key] = value === null ? null : value[i] ? value[i] : null;
           }
 
           notes.push(note);
@@ -201,11 +187,11 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
     });
 
     score.subscribe(async updates => {
-      if (updates.hasOwnProperty('notes')) {
+      if ('notes' in updates) {
         if (players.size === 0) {
           return;
         }
-        // console.log("note received", updates.notes.length);
+
         const dispatchStrategy = score.get('dispatchStrategy');
         const syncTime = sync.getSyncTime() + score.get('offsetSyncTime');
         const dispatchFunc = dispatchStrategies[dispatchStrategy];

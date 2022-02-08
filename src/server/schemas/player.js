@@ -9,13 +9,14 @@ export default {
     default: null,
     nullable: true,
   },
-  note: {
+  // should ALWAYS be an array
+  notes: {
     type: 'any',
-    default: null,
+    default: [],
     nullable: true,
     event: true,
   },
-  playTime: {
+  startSyncTime: {
     type: 'float',
     default: null,
     nullable: true,

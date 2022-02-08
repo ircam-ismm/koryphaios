@@ -1,56 +1,46 @@
 import State from './State.js';
 import { html } from 'lit-html';
 import '@ircam/simple-components/sc-button.js';
-import Note from '../audioEngine/Note.js';
+import Note from '../audio/Note.js';
 
 export default class PlayingScreen extends State {
-
-
   async enter() {
-    this.context.globalMasterBus.connect(this.context.audioContext.destination);
-
     const activeNotes = new Set();
 
     this.playerStateUnsubscribe = this.context.playerState.subscribe(updates => {
-      if (updates.hasOwnProperty('note')) {
-        console.log('received note zeqzeqze:', updates.note);
-        const playTime = this.context.sync.getLocalTime(updates.playTime);
-        console.log(updates.playTime, playTime);
+      if ('notes' in updates) {
+        const notes = updates.notes;
+        const startSyncTime = updates.startSyncTime;
+        const startTime = this.context.sync.getLocalTime(startSyncTime);
 
-        if (Array.isArray(updates.note)) {
-          for (let i = 0; i < updates.note.length; i++) {
-            const note = new Note(this.context.audioContext, updates.note[i]);
-            note.connect(this.context.synthMasterBus[updates.note[i].metas.synthType].input);
-            note.play(playTime);
-            activeNotes.add(note); //how/when to remove it ?
+        for (let i = 0; i < notes.length; i++) {
+          const note = new Note(this.context.audioContext, notes[i]);
+          const bus = this.context.synthBuses[note.data.synthType];
 
-            // setTimeout(() => {
-            //   activeNotes.delete(note)
-            // }, updates.note[i].duration*1000 + 500); // To fix
-          }
+          note.connect(bus.input);
+          note.play(startTime);
 
-        } else {
-          const note = new Note(this.context.audioContext, updates.note);
-          note.connect(this.context.synthMasterBus[updates.note.metas.synthType].input);
-          note.play(playTime);
+          // book-keeping notes for transport stop event
           activeNotes.add(note);
 
-          // setTimeout(() => {
-          //     activeNotes.delete(note)
-          // }, updates.note.duration*1000 + 500);
+          setTimeout(() => {
+            activeNotes.delete(note);
+          }, note.data.duration * 1000);
         }
       }
     });
 
     this.scoreUnsubscribe = this.context.score.subscribe(updates => {
-      if (updates.hasOwnProperty('transport')) {
+      if ('transport' in updates) {
         if (updates.transport === 'stop') {
-          activeNotes.forEach(note => note.stop(this.context.audioContext.currentTime));
+          const now = this.context.audioContext.currentTime;
+
+          activeNotes.forEach(note => {
+            note.stop(now);
+          });
+
           activeNotes.clear();
         }
-      }
-      if (updates.hasOwnProperty('state')) {
-        this.context.playerState.set({ state: updates.state });
       }
     });
   }
@@ -58,7 +48,6 @@ export default class PlayingScreen extends State {
   async exit() {
     this.playerStateUnsubscribe();
     this.scoreUnsubscribe();
-    this.context.globalMasterBus.disconnect();
   }
 
   render() {

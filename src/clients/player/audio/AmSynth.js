@@ -33,41 +33,38 @@ export default class AmSynth {
       },
     };
 
-    //Creating nodes
+    // create graph
+    this._output = this.audioContext.createGain();
+
     this._carrier = this.audioContext.createOscillator();
     this._carrier.frequency.value = this.userParams.carrFreq.default;
     this._carrier.type = this.userParams.carrType.default;
+
     this._modulator = this.audioContext.createOscillator();
     this._modulator.frequency.value = this.userParams.modFreq.default;
     this._modulator.type = this.userParams.modType.default;
+
     this._depth = this.audioContext.createGain();
     this._depth.gain.value = this.userParams.modDepth.default;
+
+    // no need for this one
     this._offset = this.audioContext.createConstantSource();
     this._offset.offset.value = 1 - this.userParams.modDepth.default;
+
     this._scale = this.audioContext.createGain();
     this._scale.gain.value = 0.5;
-    this._gain = this.audioContext.createGain();
-    this._output = this.audioContext.createGain();
+
+    this._modulated = this.audioContext.createGain();
 
     this.modDepth = 0;
 
-    //Connections
-    this._carrier.connect(this._gain);
-    this._gain.connect(this._output);
+    this._carrier.connect(this._modulated);
+    this._modulated.connect(this._output);
     
     this._modulator.connect(this._depth);
     this._depth.connect(this._scale);
     this._offset.connect(this._scale);
-    this._scale.connect(this._gain.gain);
-
-    //getters
-    // Object.keys(this.userParams).forEach(key => {
-    //   Object.defineProperty(this, key, {
-    //     get() {
-    //       return this.userParams[key].value;
-    //     }
-    //   });
-    // });
+    this._scale.connect(this._modulated.gain);
   }
 
   connect(dest) {
@@ -86,7 +83,7 @@ export default class AmSynth {
     this._offset.stop(time);
   }
 
-  get detune() {
+  get detuneParam() {
     return this._carrier.detune;
   }
 

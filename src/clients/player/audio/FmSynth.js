@@ -74,7 +74,7 @@ export default class FmSynth {
     this._modulator.stop(time);
   }
 
-  get detune() {
+  get detuneParam() {
     return this._carrier.detune;
   }
 
