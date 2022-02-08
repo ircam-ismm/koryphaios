@@ -40,15 +40,17 @@ export default class Note {
         break;
     }
 
-    this.noDetuneEnveloppe = [[0,0,0],[0,1,0]]; 
-    if (this.detuneBreakpoints !== null && this.detuneBreakpoints !== undefined && this.detuneBreakpoints !== this.noDetuneEnveloppe) {
+    this.hasVolumeEnveloppe = (this.envBreakpoints !== null && this.envBreakpoints !== undefined && this.envBreakpoints.length > 0);
+    const defaultDetuneEnveloppe = [[0,0,0],[0,1,0]]; 
+    this.hasDetuneEnveloppe = (this.detuneBreakpoints !== null && this.detuneBreakpoints !== undefined && this.detuneBreakpoints.length > 0 && this.detuneBreakpoints !== defaultDetuneEnveloppe);
+
+    if (this.hasDetuneEnveloppe) {
       this.detuneEnveloppe = new Enveloppe(this.synth.detune, this.duration, this.detuneBreakpoints, false);
     }
-    if (this.envBreakpoints !== null && this.envBreakpoints !== undefined ) {
+    if (this.hasVolumeEnveloppe) {
       this.enveloppe = new Enveloppe(this.modGain.gain, this.duration, this.envBreakpoints, true);
     }
     
-
     this.synth.connect(this.modGain);
     this.modGain.connect(this.env);
     this.env.connect(this.output);
@@ -64,14 +66,16 @@ export default class Note {
   }
 
   start(time) {
-    if (this.detuneBreakpoints !== null && this.detuneBreakpoints !== undefined && this.detuneBreakpoints !== this.noDetuneEnveloppe) {
+    if (this.hasDetuneEnveloppe) {
       this.detuneEnveloppe.apply(time);
     }
-    if (this.envBreakpoints !== null && this.envBreakpoints !== undefined ) {
+    if (this.hasVolumeEnveloppe) {
       this.enveloppe.apply(time);
     }
     this.env.gain.setValueAtTime(0, time);
-    this.env.gain.linearRampToValueAtTime(1, time + 0.01);
+    this.env.gain.linearRampToValueAtTime(1, time + 0.01); 
+    this.env.gain.setValueAtTime(1, time + this.duration - 0.01);
+    this.env.gain.linearRampToValueAtTime(0, time + this.duration);
     this.synth.start(time);
   };
 
