@@ -26,6 +26,8 @@ class PlayerExperience extends AbstractExperience {
     this.audioBufferLoader = this.require('audio-buffer-loader');
     this.filesystem = this.require('filesystem');
 
+    this.render = this.render.bind(this);
+
     renderInitializationScreens(client, config, $container);
   }
 

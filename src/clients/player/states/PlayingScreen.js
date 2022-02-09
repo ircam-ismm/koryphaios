@@ -4,8 +4,17 @@ import '@ircam/simple-components/sc-button.js';
 import Note from '../audio/Note.js';
 
 export default class PlayingScreen extends State {
+  constructor(...args) {
+    super(...args);
+
+    this.activeNotes = new Set();
+    this.signalBuffer = new Float32Array(128);
+    this.rms = 0;
+    this.rafId = null;
+    this.rafIndex = 0;
+  }
   async enter() {
-    const activeNotes = new Set();
+    await super.enter();
 
     this.playerStateUnsubscribe = this.context.playerState.subscribe(updates => {
       if ('notes' in updates) {
@@ -15,16 +24,17 @@ export default class PlayingScreen extends State {
 
         for (let i = 0; i < notes.length; i++) {
           const note = new Note(this.context.audioContext, notes[i]);
+          // use `note.data`, as it has been normalized with defaults
           const bus = this.context.synthBuses[note.data.synthType];
 
           note.connect(bus.input);
           note.play(startTime);
 
           // book-keeping notes for transport stop event
-          activeNotes.add(note);
+          this.activeNotes.add(note);
 
           setTimeout(() => {
-            activeNotes.delete(note);
+            this.activeNotes.delete(note);
           }, note.data.duration * 1000);
         }
       }
@@ -34,33 +44,74 @@ export default class PlayingScreen extends State {
       if ('transport' in updates) {
         if (updates.transport === 'stop') {
           const now = this.context.audioContext.currentTime;
-
-          activeNotes.forEach(note => {
-            note.stop(now);
-          });
-
-          activeNotes.clear();
+          this.activeNotes.forEach(note => note.stop(now));
+          this.activeNotes.clear();
         }
       }
     });
+
+    // visual render
+    this.analyzer = this.context.audioContext.createAnalyser();
+    this.analyzer.fftSize = 128;
+    this.context.masterBus.connect(this.analyzer);
   }
 
   async exit() {
+    // clear animation
+    cancelAnimationFrame(this.rafId);
+    this.context.masterBus.disconnect(this.analyzer);
+    // clear subsubscriptions
     this.playerStateUnsubscribe();
     this.scoreUnsubscribe();
+    // clear all active notes
+    const now = this.context.audioContext.currentTime;
+    this.activeNotes.forEach(note => note.stop(now));
+    this.activeNotes.clear();
+
+    await super.exit();
   }
 
   render() {
+    this.rafId = requestAnimationFrame(this.context.render);
+
+    if (this.rafIndex === 0) {
+      this.analyzer.getFloatTimeDomainData(this.signalBuffer);
+
+      const length = this.signalBuffer.length;
+      let sum = 0;
+
+      for (let i = 0; i < length; i++) {
+        const value = this.signalBuffer[i];
+        sum += value * value;
+      }
+
+      const mean = sum / length;
+      this.rms = Math.sqrt(mean);
+    }
+
+    this.rafIndex = (this.rafIndex + 1) % 4;
+
     return html`
-      <p
-        style="
-          position: absolute;
-          top: 10%;
-          left: 50%;
-          transform: translate(-50%, 0);
-          font-size: large;
-        "
-      >${this.context.score.get('piece')} by ${this.context.score.get('composer')}</p>
+      <div style="
+        opacity: ${Math.pow(this.rms, 0.25)};
+        transition: opacity 25ms;
+        background-color: #ffffff;
+        position:  absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+      "></div>
+      <p style="
+        margin-top: 100px;
+        text-align: center;
+        font-size: large;
+      ">
+        <i>${this.context.score.get('piece')}</i>
+        <br /><br />by</br /><br />
+        ${this.context.score.get('composer')}
+      </p>
     `;
   }
 }
