@@ -2,19 +2,13 @@ import State from './State.js';
 import { html } from 'lit-html';
 import '@ircam/simple-components/sc-button.js';
 
-export default class EndScreen extends State {
-
-
+export default class Waiting extends State {
   async enter() {
-    this.scoreUnsubscribe = this.context.score.subscribe(updates => {
-      if (updates.hasOwnProperty('state')) {
-        this.context.playerState.set({ state: updates.state });
-      }
-    });
+    await super.enter();
   }
 
   async exit() {
-    this.scoreUnsubscribe();
+    await super.exit();
   }
 
   render() {
@@ -27,7 +21,7 @@ export default class EndScreen extends State {
           transform: translate(-50%, 0);
           font-size: large;
         "
-      >Concert is over</p>
+      >${this.context.score.get('piece')} by ${this.context.score.get('composer')}</p>
       <p
         style="
           position: absolute;
@@ -36,7 +30,7 @@ export default class EndScreen extends State {
           transform: translate(-50%, 0);
           font-size: large;
         "
-      >Thank you for coming</p>
+      >Concert will begin shortly</p>
     `;
   }
 }

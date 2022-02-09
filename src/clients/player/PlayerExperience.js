@@ -1,7 +1,9 @@
 import { AbstractExperience } from '@soundworks/core/client';
 import { render, html, nothing } from 'lit-html';
 import renderInitializationScreens from '@soundworks/template-helpers/client/render-initialization-screens.js';
-import MasterBus from './audioEngine/MasterBus';
+import masters from 'waves-masters';
+
+import AudioBus from './audio/AudioBus';
 import StateMachine from './states/StateMachine.js';
 
 /*
@@ -26,6 +28,8 @@ class PlayerExperience extends AbstractExperience {
     this.audioBufferLoader = this.require('audio-buffer-loader');
     this.filesystem = this.require('filesystem');
 
+    this.render = this.render.bind(this);
+
     renderInitializationScreens(client, config, $container);
   }
 
@@ -35,75 +39,75 @@ class PlayerExperience extends AbstractExperience {
     this.stateMachine = new StateMachine(this);
 
     this.playerState = await this.client.stateManager.create('player', { group: this.group });
-    this.score = await this.client.stateManager.attach('score');
+    this.playerState.subscribe(async updates => this.render());
 
-    this.playerState.subscribe(async updates => {
+    this.score = await this.client.stateManager.attach('score');
+    this.score.subscribe(async updates => {
       if ('state' in updates) {
         this.stateMachine.setState(updates.state);
       }
+
       this.render();
     });
 
-    //Filesystem for samples
-    this.filesystem.subscribe(() => this.loadSoundbank());
-    await this.loadSoundbank();
-    // const loadedData = await this.audioBufferLoader.load({
-    //   'drum-loop': 'samples/drum-loop.wav',
-    // }, true);
+    // create audio pipeline
+    this.masterBus = new AudioBus(this.audioContext, this.score.get('masterBusConfig'));
+    this.masterBus.connect(this.audioContext.destination);
+    // bus for each synths
+    this.synthBuses = {};
 
+    ['sine', 'am', 'fm'].forEach(synthType => {
+      this.synthBuses[synthType] = new AudioBus(this.audioContext, this.score.get('synthBusConfig'));
+      this.synthBuses[synthType].connect(this.masterBus.input);
+    });
 
-    //Audio pipeline
-    this.globalMasterBus = new MasterBus(this.audioContext, { panner: false, filter: true});
-    const synths = ['sine', 'am', 'fm'];
-    this.synthMasterBus = {};
-    for (let i = 0; i < synths.length; i++) {
-      const synthType = synths[i];
-      this.synthMasterBus[synthType] = new MasterBus(this.audioContext, { panner: false, filter: true });
-      this.synthMasterBus[synthType].connect(this.globalMasterBus.input);
-    }
-    // this.globalMasterBus.connect(this.audioContext.destination);
+    // test buses
+    // ['sine', 'am', 'fm'].forEach((synthType, index) => {
+    //   console.log('test bus:', synthType, 200 * (index + 1));
+    //   const now = this.audioContext.currentTime;
+    //   const osc = this.audioContext.createOscillator();
+    //   osc.connect(this.synthBuses[synthType].input);
+    //   // osc.connect(this.masterBus.input);
+    //   osc.frequency.value = 200 * (index + 1);
+    //   osc.start(now + index);
+    //   osc.stop(now + index + 1);
+    // });
 
-    this.synthMasterControls = {};
-    // //State manager handling
     this.client.stateManager.observe(async (schemaName, stateId, nodeId) => {
       if (schemaName.includes("BusControls")) {
-        const groupControls = await this.client.stateManager.attach(schemaName, stateId);
-        const synthType = groupControls.get('synthType');
-        
-        if (synthType === 'global') {
-          const initValues = groupControls.getValues();
-          for (const [key, value] of Object.entries(initValues)) {
-            this.globalMasterBus[key] = value;
+        const state = await this.client.stateManager.attach(schemaName, stateId, nodeId);
+        const name = state.get('name');
+        const audioBus = name === 'master' ? this.masterBus : this.synthBuses[name];
+        // init with current values
+        for (const [key, value] of Object.entries(state.getValues())) {
+          if (key in audioBus) {
+            audioBus[key] = value;
           }
-
-          groupControls.subscribe(updates => {
-            for (const [key, value] of Object.entries(updates)) {
-              this.globalMasterBus[key] = value;
-            }
-          });
-        } else {
-          const initValues = groupControls.getValues();
-          for (const [key, value] of Object.entries(initValues)) {
-            this.synthMasterBus[synthType][key] = value;
-          }
-
-          groupControls.subscribe(updates => {
-            for (const [key, value] of Object.entries(updates)) {
-              this.synthMasterBus[synthType][key] = value;
-            }
-          });
         }
+
+        state.subscribe(updates => {
+          for (const [key, value] of Object.entries(updates)) {
+            if (key in audioBus) {
+              audioBus[key] = value;
+            }
+          }
+        });
       }
     });
+
+    // filesystem for samples
+    this.filesystem.subscribe(() => this.loadSoundbank());
+    await this.loadSoundbank();
+
+    // local time scheduler
+    const getTimeFunction = () => this.audioContext.currentTime;
+    this.scheduler = new masters.Scheduler(getTimeFunction);
   
+    // is this used?
     await this.playerState.set({ id: this.checkin.get('index')});
 
-
-    if (this.score.get('concertMode')) {
-      this.playerState.set({ state: 'test' });
-    } else {
-      this.playerState.set({ state: 'playing' });
-    }
+    const state = this.score.get('state');
+    this.stateMachine.setState(state);
 
     window.addEventListener('resize', () => this.render());
     this.render();
@@ -126,7 +130,7 @@ class PlayerExperience extends AbstractExperience {
 
   render() {
     render(html`
-      <div class="main">
+      <div class="main" style="padding: 20px;">
         ${this.stateMachine.state ?
         this.stateMachine.state.render() :
         nothing

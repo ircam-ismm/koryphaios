@@ -1,11 +1,12 @@
 import { AbstractExperience } from '@soundworks/core/client';
-import { render, html } from 'lit-html';
+import { render, html, nothing } from 'lit-html';
 import renderInitializationScreens from '@soundworks/template-helpers/client/render-initialization-screens.js';
 import '@ircam/simple-components/sc-bang.js';
 import '@ircam/simple-components/sc-slider.js';
 import '@ircam/simple-components/sc-toggle.js';
 import '@ircam/simple-components/sc-editor.js';
 import '@ircam/simple-components/sc-button.js';
+import '@ircam/simple-components/sc-text.js';
 
 /*
 TODO: 
@@ -26,6 +27,7 @@ class ControllerExperience extends AbstractExperience {
     this.midiSetupActive = false;
     this.selectedControl = null;
 
+    this.noteLogs = [];
     // require plugins if needed
 
     renderInitializationScreens(client, config, $container);
@@ -36,73 +38,37 @@ class ControllerExperience extends AbstractExperience {
 
     this.score = await this.client.stateManager.attach('score');
 
-    this.masterControls = {};
+    this.busStates = {};
     this.client.stateManager.observe(async (schemaName, stateId, nodeId) => {
       if (schemaName.includes("BusControls")){
-        const synthType = schemaName.substring(0, schemaName.indexOf("BusControls"));
-        const groupControls = await this.client.stateManager.attach(schemaName, stateId);
-        this.masterControls[synthType] = groupControls;
+        const busState = await this.client.stateManager.attach(schemaName, stateId);
+        const name = busState.get('name');
 
-        groupControls.subscribe(updates => {
-          const synths = ['global', 'sine', 'am', 'fm'];
-          for (const synth of synths) {
-            const $controls = document.body.querySelector(`#${synth}-controls`);
-            this.renderGroupControls(synth, $controls);
-          }
-        });
+        this.busStates[name] = busState;
+
+        busState.subscribe(updates => this.render());
+
+        this.render();
       }
     });
     
     this.score.subscribe(updates => {
-      if (updates.hasOwnProperty('notes')) {
-        //Print in logger
-        const $logger = document.body.querySelector('#note-logger');
-        if ($logger.childElementCount > 100) {
-          $logger.removeChild($logger.lastChild); //Remove oldest element if too much logged
-        } 
-        const $chordParagraph = document.createElement('p');
-        let $textContent = document.createTextNode(`NEW CHORD:\r\n`);
-        $chordParagraph.appendChild($textContent);
-        
-        for (let i = 0; i < updates.notes.length; i++) {
-          const $noteparagraph = document.createElement('p');
-          $noteparagraph.setAttribute('style', 'white-space: pre;');
-          $textContent = document.createTextNode(`Note ${i}\r\n`);
-          $noteparagraph.appendChild($textContent);
-          $textContent = document.createTextNode(`frequency : ${updates.notes[i].frequency}\r\n`);
-          $noteparagraph.appendChild($textContent);
-          $textContent = document.createTextNode(`velocity (dB) : ${updates.notes[i].velocity}\r\n`);
-          $noteparagraph.appendChild($textContent);
-          $textContent = document.createTextNode(`duration (s) : ${updates.notes[i].duration}\r\n`);
-          $noteparagraph.appendChild($textContent);
-          $textContent = document.createTextNode(`enveloppe : ${JSON.stringify(updates.notes[i].enveloppe)}\r\n`);
-          $noteparagraph.appendChild($textContent);
-          $textContent = document.createTextNode(`synth type : ${updates.notes[i].metas.synthType}\r\n`);
-          $noteparagraph.appendChild($textContent);
-          switch (updates.notes[i].metas.synthType) {
-            case 'sine':
-              break;
-            case 'am':
-              $textContent = document.createTextNode(`mod freq : ${updates.notes[i].metas.modFreq}\r\n`);
-              $noteparagraph.appendChild($textContent);
-              $textContent = document.createTextNode(`mod depth : ${updates.notes[i].metas.modDepth}\r\n`);
-              $noteparagraph.appendChild($textContent);
-              break;
-            case 'fm':
-              $textContent = document.createTextNode(`harmonicity : ${updates.notes[i].metas.harmonicity}\r\n`);
-              $noteparagraph.appendChild($textContent);
-              $textContent = document.createTextNode(`mod index : ${updates.notes[i].metas.modIndex}\r\n`);
-              $noteparagraph.appendChild($textContent);
-              break;
-          }
-          $chordParagraph.appendChild($noteparagraph);
-        }  
-        $logger.prepend($chordParagraph);
+      if ('notes' in updates) {
+        updates.notes.forEach(note => this.noteLogs.unshift(note));
+
+        while (this.noteLogs.length > 20) {
+          this.noteLogs.pop();
+        }
       }
+
+      this.render();
     });
+
+    this.render();
     window.addEventListener('resize', () => this.render());
 
-    //MIDI
+    // MIDI bindings
+    // @todo - test again
     this.midiControlDict = {};
 
     const getMIDIMessage = (midiMessage) => {
@@ -120,19 +86,19 @@ class ControllerExperience extends AbstractExperience {
           switch (key) {
             case 'mute':
               console.log(value);
-              const muteVal = this.masterControls[synthType].get('mute');
+              const muteVal = this.busStates[synthType].get('mute');
               if (value === 127) {
-                this.masterControls[synthType].set({ mute: !muteVal });
+                this.busStates[synthType].set({ mute: !muteVal });
               }
               break;
             case 'volume':
-              this.masterControls[synthType].set({ volume: -60. + value * 60. / 127. });
+              this.busStates[synthType].set({ volume: -60. + value * 60. / 127. });
               break;
             case 'lowPassFreq':
-              this.masterControls[synthType].set({ lowPassFreq: 20 + value * (20000 - 20) / 127. });
+              this.busStates[synthType].set({ lowPassFreq: 20 + value * (20000 - 20) / 127. });
               break;
             case 'highPassFreq':
-              this.masterControls[synthType].set({ highPassFreq: 20 + value * (20000 - 20) / 127. });
+              this.busStates[synthType].set({ highPassFreq: 20 + value * (20000 - 20) / 127. });
               break;
           }
         }
@@ -141,369 +107,233 @@ class ControllerExperience extends AbstractExperience {
 
     const midiAccess = await navigator.requestMIDIAccess();
     const midiInputDevices = midiAccess.inputs.values();
-    for (let device of midiInputDevices) {      
+
+    for (let device of midiInputDevices) {
       device.addEventListener('midimessage', getMIDIMessage);
-      // device.onmidimessage = getMIDIMessage;
-    } 
+    }
 
+    const synths = ['global', 'sine', 'am', 'fm'];
+    const controls = ['mute', 'volume', 'lowPassFreq', 'highPassFreq'];
 
+    for (const synth of synths) {
+      for (const control of controls) {
+        const $control = document.body.querySelector(`#${synth}-${control}`);
 
-    //Rendering
-    this.render();
-    setTimeout(() => { 
-      const synths = ['global', 'sine', 'am', 'fm'];
-      for (let i = 0; i < synths.length; i++) {
-        const $controls = document.body.querySelector(`#${synths[i]}-controls`);
-        this.renderGroupControls(synths[i], $controls); 
-      }
-    }, 50); // no workaround ??
-
-    //MIDI setup mode
-    setTimeout(() => {
-      const synths = ['global', 'sine', 'am', 'fm'];
-      const controls = ['mute', 'volume', 'lowPassFreq', 'highPassFreq'];
-      for (const synth of synths) {
-        for (const control of controls) {
-          const $control = document.body.querySelector(`#${synth}-${control}`);
-          $control.addEventListener('click', () => {
-            if (this.midiSetupActive) {
-              this.selectedControl = $control;
-            }
-          })
+        if (!$control) {
+          continue;
         }
-      }
-    }, 200);
-    
-    // this.renderGroupControls(document.body.querySelector('#gp1-controls'));
-  }
 
-  clearLog() {
-    const $logger = document.body.querySelector('#note-logger');
-    const nLogged = $logger.childElementCount;
-    for (var i = 0; i < nLogged; i++) {
-      $logger.removeChild($logger.lastChild);
+        $control.addEventListener('click', () => {
+          if (this.midiSetupActive) {
+            this.selectedControl = $control;
+          }
+        })
+      }
     }
   }
 
-  activateMidiSetup(activated) {
-    this.midiSetupActive = activated;
-    if (activated) {this.selectedControl = null}
-  }
-
-  renderGroupControls(synthType, container) {
-    this.rafId = window.requestAnimationFrame(() => {
-      render(html`
-        <p
-          style="
-            position: absolute;
-            left: 2%;
-            top: 0%;
-            font-size: x-large;
-          "
-          >${synthType} controls </p>
-        <p
-          style="
-            position: absolute;
-            left: 2%;
-            top: 22%;
-            font-size: medium;
-          "
-        >Mute: </p>
-        <sc-toggle
-          style="
-            position: absolute;
-            left: 26%;
-            top: 22%;
-          "
-          id="${synthType}-mute";
-          width="50";
-          height="50";
-          ?active="${this.masterControls[synthType].get('mute')}"
-          @change="${e => this.masterControls[synthType].set({ mute: e.detail.value })}"
-        ></sc-toggle>
-
-        <p
-          style="
-            position: absolute;
-            left: 2%;
-            top: 40%;
-            font-size: medium;
-          "
-        >Volume: </p>
-        <sc-slider
-          style="
-            position: absolute;
-            left: 26%;
-            top: 42%;
-          "
-          id="${synthType}-volume";
-          height="40"
-          width="290"
-          min="-60"
-          max="0"
-          value="${this.masterControls[synthType].get('volume')}"
-          @input="${e => this.masterControls[synthType].set({ volume: e.detail.value })}"
-          display-number
-        ></sc-slider>
-
-        <p
-          style="
-            position: absolute;
-            left: 2%;
-            top: 58%;
-            font-size: medium;
-          "
-        >Low-pass </br>freq: </p>
-        <sc-slider
-          style="
-            position: absolute;
-            left: 26%;
-            top: 62%;
-          "
-          id="${synthType}-lowPassFreq";
-          height="40"
-          width="290"
-          min="20"
-          max="20000"
-          value="${this.masterControls[synthType].get('lowPassFreq')}"
-          @input="${e => this.masterControls[synthType].set({ lowPassFreq: e.detail.value })}"
-          display-number
-        ></sc-slider>
-
-        <p
-          style="
-            position: absolute;
-            left: 2%;
-            top: 78%;
-            font-size: medium;
-          "
-        >High-pass </br>freq: </p>
-        <sc-slider
-          style="
-            position: absolute;
-            left: 26%;
-            top: 82%;
-          "
-          id="${synthType}-highPassFreq";
-          height="40"
-          width="290"
-          min="20"
-          max="20000"
-          value="${this.masterControls[synthType].get('highPassFreq')}"
-          @input="${e => this.masterControls[synthType].set({ highPassFreq: e.detail.value })}"
-          display-number
-        ></sc-slider>
-      `, container);
-    });
-  }
-
-
-
   render() {
-    // debounce with requestAnimationFrame
-    window.cancelAnimationFrame(this.rafId);
+    render(html`
+      <div style="padding: 20px">
+        <div>
+          <h1
+            style="margin-top: 0; padding-bottom: 20px; border-bottom: 1px solid #787878"
+          >
+            ${this.score.get('piece')} by ${this.score.get('composer')}
+          </h1>
 
-    this.rafId = window.requestAnimationFrame(() => {
-      render(html`
-        <div style="padding: 10px">
-          <h1 style="margin: 20px 0">${this.client.type} [id: ${this.client.id}]</h1>
-        </div>
-
-        <!--Performance state-->
-        <p
-          style="
-            position: absolute;
-            top: 20px;
-            left: 320px;
-            font-size: medium;
-          "
-        >Performance state : </p>
-        <sc-button
-          style="
-            position: absolute;
-            top: 25px;
-            left: 520px;
-          "
-          width="200"
-          text="start performance"
-          @input="${e => this.score.set({ state: "playing" })}"
-        ></sc-button>
-        <sc-button
-          style="
-            position: absolute;
-            top: 25px;
-            left: 750px;
-          "
-          width="200"
-          text="end performance"
-          @input="${e => this.score.set({ state: "end" })}"
-        ></sc-button>
-        <sc-button
-          style="
-            position: absolute;
-            top: 25px;
-            left: 980px;
-          "
-          width="200"
-          text="waiting screen"
-          @input="${e => this.score.set({ state: "waiting" })}"
-        ></sc-button>
-
-
-
-        <!--Note logger-->
-        <div 
-          style="
-            position: absolute;
-            top: 70px;
-            left: 5px;
-            height: 400px;
-            width: 300px;
-          "
-        >
-          <p
-            style="
-              position: absolute;
-              font-size: medium;
-            "
-          >OSC log: </p>
+          <!-- MIDI setup -->
           <div
             style="
               position: absolute;
-              top: 10%;
-              height: 90%;
-              width: 100%;
+              top: 20px;
+              right: 20px;
+            "
+          >
+            <sc-text
+              readonly
+              value="MIDI setup mode"
+            ></sc-text>
+            <sc-toggle
+              @change="${e => {
+                this.midiSetupActive = e.detail.value;
+                this.selectedControl = null;
+              }}"
+            ></sc-toggle>
+
+          </div>
+        </div>
+
+        <div style="
+          width: 320px;
+          padding:10px;
+          background-color: #121212;
+          float: left;
+        ">
+
+          <div>
+            <h2>Performance State</h2>
+
+            <div style="margin-bottom: 4px">
+              <sc-text
+                readonly
+                width="264"
+                value="concert mode"
+              ></sc-text>
+              <sc-toggle
+                ?active="${this.score.get('concertMode')}"
+                @change="${e => this.score.set({ concertMode: e.detail.value })}"
+              ></sc-toggle>
+            </div>
+
+            ${['welcome', 'test', 'waiting', 'performance', 'end', 'playground'].map(name => {
+              let current = this.score.get('state');
+              return html`
+                <sc-button
+                  style="display: block; margin-bottom: 4px"
+                  width="300"
+                  value="${name}"
+                  ?selected="${name === current}"
+                  @input="${e => this.score.set({ state: name })}"
+                ></sc-button>
+              `;
+            })}
+          </div>
+
+          <!-- dispatch strategies -->
+          <div>
+            <h2>Dispatch strategies</h2>
+            ${this.score.get('dispatchStrategies').map(name => {
+              let current = this.score.get('dispatchStrategy');
+              return html`
+                <sc-button
+                  style="display: block; margin-bottom: 4px"
+                  width="300"
+                  value="${name}"
+                  .selected="${name === current}"
+                  @input="${e => this.score.set({ dispatchStrategy: name })}"
+                ></sc-button>
+              `;
+            })}
+          </div>
+
+          <!-- logs -->
+          <div>
+            <h2>Notes</h2>
+            <div style="
+              width: 300px;
+              height: 300px;
+              background-color: #343434;
               overflow: auto;
-              background-color: rgba(255, 255, 255, .4);
-            "
-            id="note-logger"
-          ></div>
-          <sc-button
-            style="
-              position: absolute;
-              top: 370px;
-              left: 250px;
-            "
-            @press="${e => this.clearLog()}"
-            height="30"
-            width="50"
-            text="clear"
-          ></sc-button>
-
+              margin-bottom: 4px;
+              padding: 2px;
+            ">
+              <pre>${this.noteLogs.map(note => JSON.stringify(note)).join('\n\n')}</pre>
+            </div>
+            <sc-button
+              value="clear"
+              width="300"
+              @input="${e => { this.noteLogs.length = 0; this.render(); }}"
+            ></sc-button>
+          </div>
         </div>
 
-        <!--Code for dispatch-->
-        <div 
-          style="
-            position: absolute;
-            top: 480px;
-            left: 5px;
-            height: 270px;
-            width: 300px;
-          "
-        >
-          <p
-            style="
-              position: absolute;
-              font-size: medium;
-            "
-          >Dispatch strategy: </p>
-          <sc-button
-            style="
-              position: absolute;
-              top: 14%;
-            "
-            text="send-all"
-            @input="${e => this.score.set({ dispatchStrategy: 'sendAll' })}"
-          ></sc-button>
-          <sc-button
-            style="
-              position: absolute;
-              top: 26%;
-            "
-            text="random-spread"
-            @input="${e => this.score.set({dispatchStrategy: 'randomSpread'})}"
-          ></sc-button>
+        <!-- bus controls -->
+        <div style="
+          width: calc(100vw - 40px - 300px - 40px);
+          height: 400px;
+          /*background-color: red;*/
+          float: left;
+          margin-left: 20px;
+        ">
+          ${['master', 'sine', 'am', 'fm'].map(name => {
+            const state = this.busStates[name];
+            // state may not be ready yet
+            if (!state) {
+              return nothing;
+            }
 
+            const config = name === 'master' ?
+              this.score.get('masterBusConfig') :
+              this.score.get('synthBusConfig');
+
+            return html`
+              <div style="
+                background-color: #121212;
+                margin-bottom: 10px;
+                padding: 10px;
+              ">
+                <h2 style="margin: 0 0 10px 0">${name} bus</h2>
+
+                <div style="margin-bottom: 4px">
+                  <sc-text
+                    readonly
+                    value="mute"
+                  ></sc-text>
+                  <sc-toggle
+                    id="${name}-mute"
+                    .active="${state.get('mute')}"
+                    @change="${e => state.set({ mute: e.detail.value })}"
+                  ></sc-toggle>
+                </div>
+                <div style="margin-bottom: 4px">
+                  <sc-text
+                    readonly
+                    value="volume - dB"
+                  ></sc-text>
+                  <sc-slider
+                    id="${name}-volume"
+                    width="400"
+                    display-number
+                    min="${state.getSchema('volume').min}"
+                    max="${state.getSchema('volume').max}"
+                    value="${state.get('volume')}"
+                    @input="${e => state.set({ volume: e.detail.value })}"
+                  ></sc-slider>
+                </div>
+
+                ${config.filter ?
+                  html`
+                    <div style="margin-bottom: 4px">
+                      <sc-text
+                        readonly
+                        value="lowpass - Hz"
+                      ></sc-text>
+                      <sc-slider
+                        id="${name}-lowPassFreq"
+                        width="400"
+                        display-number
+                        min="${state.getSchema('lowPassFreq').min}"
+                        max="${state.getSchema('lowPassFreq').max}"
+                        value="${state.get('lowPassFreq')}"
+                        @input="${e => state.set({ lowPassFreq: e.detail.value })}"
+                      ></sc-slider>
+                    </div>
+                    <div style="margin-bottom: 4px">
+                      <sc-text
+                        readonly
+                        value="highpass - Hz"
+                      ></sc-text>
+                      <sc-slider
+                        id="${name}-highPassFreq"
+                        width="400"
+                        display-number
+                        min="${state.getSchema('highPassFreq').min}"
+                        max="${state.getSchema('highPassFreq').max}"
+                        value="${state.get('highPassFreq')}"
+                        @input="${e => state.set({ highPassFreq: e.detail.value })}"
+                      ></sc-slider>
+                    </div>
+                  ` : nothing
+                }
+              </div>
+            `;
+          })}
         </div>
 
-        <!--Global controls-->
-        <div 
-          style="
-            position: absolute;
-            top: 70px;
-            left: 320px;
-            height: 350px;
-            width: 400px;
-            background-color: rgba(0,255,0,.1);
-          "
-          id="global-controls"
-        >
-        </div>
+      </div>
 
-        <!--Sine controls-->
-        <div 
-          style="
-            position: absolute;
-            top: 70px;
-            left: 730px;
-            height: 350px;
-            width: 400px;
-            background-color: rgba(255,0,128,.15);
-          "
-          id="sine-controls"
-        >
-        </div>
-
-        <!--AM controls-->
-        <div 
-          style="
-            position: absolute;
-            top: 430px;
-            left: 320px;
-            height: 350px;
-            width: 400px;
-            background-color: rgba(128,0,255,.15);
-          "
-          id="am-controls"
-        >
-        </div>
-
-        <!--FM controls-->
-        <div 
-          style="
-            position: absolute;
-            top: 430px;
-            left: 730px;
-            height: 350px;
-            width: 400px;
-            background-color: rgba(219,128,7,.3);
-          "
-          id="fm-controls"
-        >
-        </div>
-
-        <!--Toggle MIDI setup-->
-        <div
-          style="
-            position: absolute;
-            top: 70px;
-            left: 1200px;
-          "
-        >
-          <p
-            style="font-size: large"
-          >MIDI</br> setup</br> mode:<p>
-          <sc-toggle
-            height="50";
-            width="50";
-            @change="${e => this.activateMidiSetup(e.detail.value)}";
-          ></sc-toggle>
-
-        </div>
-        
-      `, this.$container);
-    });
+    `, this.$container);
   }
 }
 
