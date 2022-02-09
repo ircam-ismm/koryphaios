@@ -1,6 +1,8 @@
 import { AbstractExperience } from '@soundworks/core/client';
 import { render, html, nothing } from 'lit-html';
 import renderInitializationScreens from '@soundworks/template-helpers/client/render-initialization-screens.js';
+import masters from 'waves-masters';
+
 import AudioBus from './audio/AudioBus';
 import StateMachine from './states/StateMachine.js';
 
@@ -62,6 +64,10 @@ class PlayerExperience extends AbstractExperience {
       this.synthBuses[synthType].connect(this.masterBus.input);
     });
 
+    // local time scheduler
+    const getTimeFunction = () => this.audioContext.currentTime;
+    this.scheduler = new masters.Scheduler(getTimeFunction);
+
     // test buses
     // ['sine', 'am', 'fm'].forEach((synthType, index) => {
     //   console.log('test bus:', synthType, 200 * (index + 1));
@@ -103,7 +109,8 @@ class PlayerExperience extends AbstractExperience {
       const state = this.score.get('state');
       this.playerState.set({ state });
     } else {
-      this.playerState.set({ state: 'playing' });
+      this.playerState.set({ state: 'performance' });
+      // this.playerState.set({ state: 'test' });
     }
 
     window.addEventListener('resize', () => this.render());
@@ -127,7 +134,7 @@ class PlayerExperience extends AbstractExperience {
 
   render() {
     render(html`
-      <div class="main">
+      <div class="main" style="padding: 20px;">
         ${this.stateMachine.state ?
         this.stateMachine.state.render() :
         nothing

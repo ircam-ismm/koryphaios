@@ -2,7 +2,7 @@ import State from './State.js';
 import { html } from 'lit-html';
 import '@ircam/simple-components/sc-button.js';
 
-export default class EndScreen extends State {
+export default class End extends State {
 
 
   async enter() {

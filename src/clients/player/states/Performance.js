@@ -3,7 +3,7 @@ import { html } from 'lit-html';
 import '@ircam/simple-components/sc-button.js';
 import Note from '../audio/Note.js';
 
-export default class PlayingScreen extends State {
+export default class Performance extends State {
   constructor(...args) {
     super(...args);
 
@@ -94,7 +94,7 @@ export default class PlayingScreen extends State {
     return html`
       <div style="
         opacity: ${Math.pow(this.rms, 0.25)};
-        transition: opacity 25ms;
+        transition: opacity 100ms;
         background-color: #ffffff;
         position:  absolute;
         top: 0;

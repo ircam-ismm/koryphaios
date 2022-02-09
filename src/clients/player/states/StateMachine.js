@@ -1,16 +1,16 @@
-import WelcomeScreen from './WelcomeScreen.js';
+import Welcome from './Welcome.js';
 import Test from './Test.js';
-import WaitingScreen from './WaitingScreen.js';
-import PlayingScreen from './PlayingScreen.js';
-import EndScreen from './EndScreen.js';
+import Waiting from './Waiting.js';
+import Performance from './Performance.js';
+import End from './End.js';
 import Playground from './Playground.js';
 
 const states = {
-  'welcome-screen': WelcomeScreen,
+  'welcome': Welcome,
   'test': Test,
-  'waiting': WaitingScreen,
-  'playing': PlayingScreen,
-  'end': EndScreen,
+  'waiting': Waiting,
+  'performance': Performance,
+  'end': End,
   'playground': Playground,
 };
 

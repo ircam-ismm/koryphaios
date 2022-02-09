@@ -1,25 +1,14 @@
-import masters from 'waves-masters';
-
 export default class GranularSynth {
   constructor(audioContext, buffer) {
     this.audioContext = audioContext;
     this.buffer = buffer;
 
-    //Scheduler
-    const getTimeFunction = () => audioContext.currentTime;
-    this.scheduler = new masters.Scheduler(getTimeFunction);
-
-    //Engine 
-    this.engine = new GranularEngine(this.audioContext, this.buffer);
-    this.scheduler.add(this.engine);
-
-    //Creating nodes
+    // audo graph
     this._output = this.audioContext.createGain();
-
-    //Connections
+    this.engine = new GranularEngine(this.audioContext, this.buffer);
     this.engine.connect(this._output);
 
-    //User-set parameters
+    // user-set parameters
     this.userParams = {
       period: {
         type: 'number',
@@ -51,11 +40,12 @@ export default class GranularSynth {
   }
   
   start(time) {
-
+    this.context.scheduler.add(this.engine, time);
   }
 
   stop(time) {
-
+    // need to properly remove
+    // this.context.scheduler.remove(this.engine);
   }
 
   set period(f) {

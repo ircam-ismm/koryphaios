@@ -2,7 +2,7 @@ import State from './State.js';
 import { html } from 'lit-html';
 import '@ircam/simple-components/sc-button.js';
 
-export default class WaitingScreen extends State {
+export default class Waiting extends State {
   async enter() {
     await super.enter();
   }
