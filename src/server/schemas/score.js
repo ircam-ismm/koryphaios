@@ -16,9 +16,13 @@ export default {
     default: '',
     event: true,
   },
+  dispatchStrategies: {
+    type: 'any',
+    default: [],
+  },
   dispatchStrategy: {
     type: 'string',
-    default: 'randomSpread',
+    default: 'random-spread',
   },
   concertMode: {
     type: 'boolean',
@@ -26,7 +30,7 @@ export default {
   },
   state: {
     type: 'string',
-    default: 'waiting',
+    default: null,
     nullable: true,
   },
   defaultSynth: {
@@ -46,5 +50,14 @@ export default {
     type: 'string',
     default: null,
     nullable: true,
-  }
-}
+  },
+  // could be in bus states but creates problems for now
+  masterBusConfig: {
+    type: 'any',
+    default: { panning: false, filter: true },
+  },
+  synthBusConfig: {
+    type: 'any',
+    default: { panning: false, filter: false },
+  },
+};

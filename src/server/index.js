@@ -66,11 +66,10 @@ server.pluginManager.register('filesystem', pluginFilesystemFactory, {
 // server.stateManager.registerSchema(name, schema);
 server.stateManager.registerSchema('score', scoreSchema);
 server.stateManager.registerSchema('player', playerSchema);
-server.stateManager.registerSchema('globalBusControls', busControlsSchema);
+server.stateManager.registerSchema('masterBusControls', busControlsSchema);
 server.stateManager.registerSchema('sineBusControls', busControlsSchema);
 server.stateManager.registerSchema('amBusControls', busControlsSchema);
 server.stateManager.registerSchema('fmBusControls', busControlsSchema);
-
 
 (async function launch() {
   try {
@@ -95,11 +94,25 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
       piece: config.app.piece, 
       composer: config.app.composer,
       concertMode: false,
+      dispatchStrategies: Object.keys(dispatchStrategies),
     });
-    const globalMasterControls = await server.stateManager.create('globalBusControls', { name: 'global' });
-    const sineMasterControls = await server.stateManager.create('sineBusControls', { name: 'sine' });
-    const amMasterControls = await server.stateManager.create('amBusControls', { name: 'am' });
-    const fmMasterControls = await server.stateManager.create('fmBusControls', { name: 'fm' });
+
+    // this is a good example for state-manager-osc improvements
+    const masterBusControls = await server.stateManager.create('masterBusControls', {
+      name: 'master',
+    });
+
+    const sineBusControls = await server.stateManager.create('sineBusControls', {
+      name: 'sine',
+    });
+
+    const amBusControls = await server.stateManager.create('amBusControls', {
+      name: 'am',
+    });
+
+    const fmBusControls = await server.stateManager.create('fmBusControls', {
+      name: 'fm',
+    });
 
     const playerExperience = new PlayerExperience(server, 'player');
     const controllerExperience = new ControllerExperience(server, 'controller');
@@ -138,7 +151,7 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
     });
 
     // hook to parse `notes` from raw `chord`
-    server.stateManager.registerUpdateHook('score', updates => {
+    server.stateManager.registerUpdateHook('score', (updates, currentState) => {
       if ('chord' in updates) {
         const chord = updates.chord; // raw Max message
         // format lisp like lists from Bach
@@ -184,6 +197,23 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
           ...updates,
         };
       }
+
+      if ('state' in updates) {
+        // if not in concert mode, force 'performace' state
+        if (!currentState.concertMode) {
+          return { state: 'performance' };
+        }
+      }
+
+      if ('concertMode' in updates) {
+        // if not in concert mode, force 'performace' state
+        if (!updates.concertMode) {
+          return {
+            state: 'performance',
+            ...updates,
+          };
+        }
+      }
     });
 
     score.subscribe(async updates => {
@@ -198,6 +228,9 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
         dispatchFunc(players, updates.notes, syncTime);
       }
     });
+
+    // do that here instead of a initialization to pass through update hook
+    score.set({ state: 'welcome' })
 
     // start all the things
     await server.start();

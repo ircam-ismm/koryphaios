@@ -49,13 +49,15 @@ export default class Note {
     });
 
     this.data.velocity = decibelToLinear(this.data.velocity);
-    // from this point no further normalization should occur
+
+    // @note - from this point no further normalization should occur
+    // console.log(this.data);
 
     this.output = this.audioContext.createGain();
     this.output.gain.value = 0;
 
     this.env = this.audioContext.createGain();
-    this.env.gain.value = this.data.envelope !== null ? 0 : 1;
+    this.env.gain.value = this.data.envelope !== null && this.data.envelope.length > 0 ? 0 : 1;
     this.env.connect(this.output);
 
     switch (this.data.synthType) {
@@ -95,7 +97,7 @@ export default class Note {
         continue;
       }
 
-      if (this.data[key] !== null) {
+      if (this.data[key] !== null && this.data[key].length > 0) {
         const envelope = new Envelope(envelopes[key], this.data[key], this.data.duration);
         this.envelopes.push(envelope);
       }

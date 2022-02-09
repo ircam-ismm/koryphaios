@@ -39,9 +39,10 @@ class PlayerExperience extends AbstractExperience {
     this.stateMachine = new StateMachine(this);
 
     this.playerState = await this.client.stateManager.create('player', { group: this.group });
-    this.score = await this.client.stateManager.attach('score');
+    this.playerState.subscribe(async updates => this.render());
 
-    this.playerState.subscribe(async updates => {
+    this.score = await this.client.stateManager.attach('score');
+    this.score.subscribe(async updates => {
       if ('state' in updates) {
         this.stateMachine.setState(updates.state);
       }
@@ -49,24 +50,16 @@ class PlayerExperience extends AbstractExperience {
       this.render();
     });
 
-    // filesystem for samples
-    this.filesystem.subscribe(() => this.loadSoundbank());
-    await this.loadSoundbank();
-
     // create audio pipeline
-    this.masterBus = new AudioBus(this.audioContext, { panning: false, filter: true });
+    this.masterBus = new AudioBus(this.audioContext, this.score.get('masterBusConfig'));
     this.masterBus.connect(this.audioContext.destination);
     // bus for each synths
     this.synthBuses = {};
 
     ['sine', 'am', 'fm'].forEach(synthType => {
-      this.synthBuses[synthType] = new AudioBus(this.audioContext, { panning: false, filter: false });
+      this.synthBuses[synthType] = new AudioBus(this.audioContext, this.score.get('synthBusConfig'));
       this.synthBuses[synthType].connect(this.masterBus.input);
     });
-
-    // local time scheduler
-    const getTimeFunction = () => this.audioContext.currentTime;
-    this.scheduler = new masters.Scheduler(getTimeFunction);
 
     // test buses
     // ['sine', 'am', 'fm'].forEach((synthType, index) => {
@@ -82,9 +75,9 @@ class PlayerExperience extends AbstractExperience {
 
     this.client.stateManager.observe(async (schemaName, stateId, nodeId) => {
       if (schemaName.includes("BusControls")) {
-        const state = await this.client.stateManager.attach(schemaName, stateId);
+        const state = await this.client.stateManager.attach(schemaName, stateId, nodeId);
         const name = state.get('name');
-        const audioBus = name === 'global' ? this.masterBus : this.synthBuses[name];
+        const audioBus = name === 'master' ? this.masterBus : this.synthBuses[name];
         // init with current values
         for (const [key, value] of Object.entries(state.getValues())) {
           if (key in audioBus) {
@@ -101,17 +94,20 @@ class PlayerExperience extends AbstractExperience {
         });
       }
     });
+
+    // filesystem for samples
+    this.filesystem.subscribe(() => this.loadSoundbank());
+    await this.loadSoundbank();
+
+    // local time scheduler
+    const getTimeFunction = () => this.audioContext.currentTime;
+    this.scheduler = new masters.Scheduler(getTimeFunction);
   
     // is this used?
     await this.playerState.set({ id: this.checkin.get('index')});
 
-    if (this.score.get('concertMode')) {
-      const state = this.score.get('state');
-      this.playerState.set({ state });
-    } else {
-      this.playerState.set({ state: 'performance' });
-      // this.playerState.set({ state: 'test' });
-    }
+    const state = this.score.get('state');
+    this.stateMachine.setState(state);
 
     window.addEventListener('resize', () => this.render());
     this.render();

@@ -14,6 +14,11 @@ export default {
     max: 12.,
     default: 0.,
   },
+  // would be best but creates problem on PlayerExperience
+  // hasFilter: {
+  //   type: 'boolean',
+  //   default: false,
+  // },
   lowPassFreq: {
     type: 'float',
     min: 20,
@@ -25,5 +30,16 @@ export default {
     min: 20,
     max: 20000,
     default: 20,
-  }
-}
+  },
+  // would be best but creates problem on PlayerExperience
+  // hasPanning: {
+  //   type: 'boolean',
+  //   default: false,
+  // },
+  // panning: {
+  //   type: 'float',
+  //   min: -1,
+  //   max: 1,
+  //   default: 0,
+  // },
+};

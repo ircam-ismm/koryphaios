@@ -88,7 +88,7 @@ export default class AudioBus {
     if (filter) {
       Object.defineProperty(this, 'lowPassFreq', {
         get() {
-          return this._panner.pan.value;
+          return this._lowpass.frequency.value;
         },
         set(val) {
           const now = this.audioContext.currentTime;
@@ -100,7 +100,7 @@ export default class AudioBus {
 
       Object.defineProperty(this, 'highPassFreq', {
         get() {
-          return this._panner.pan.value;
+          return this._highpass.frequency.value;
         },
         set(val) {
           const now = this.audioContext.currentTime;
