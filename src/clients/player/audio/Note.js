@@ -4,8 +4,7 @@ import AmSynth from './AmSynth.js';
 import Envelope from './Envelope.js';
 import decibelToLinear from '../math/decibelToLinear.js';
 
-// @todo - apply defaults
-// [
+// example note data
 //   {
 //     frequency: 285.30470202322215,
 //     detune: [ [0, 0, 0], [1, 0, 0] ],
@@ -18,8 +17,6 @@ import decibelToLinear from '../math/decibelToLinear.js';
 //     fmHarmonicity: 18.01399230969316,
 //     fmModIndex: 4.206996917774388
 //   },
-//   ...
-// ]
 
 let noteDefaults = {
   frequency: 440.,
@@ -46,13 +43,13 @@ export default class Note {
       }
     }
 
-    // format curves from db to lin
+    // normalize eveything
     ['envelope'].forEach(key => {
       this.data[key].forEach(point => point[1] = decibelToLinear(point[1]));
     });
 
     this.data.velocity = decibelToLinear(this.data.velocity);
-    // console.log(JSON.stringify(data, null, 2));
+    // from this point no further normalization should occur
 
     this.output = this.audioContext.createGain();
     this.output.gain.value = 0;
@@ -120,7 +117,7 @@ export default class Note {
     this.envelopes.forEach(envelope => envelope.apply(time));
 
     this.output.gain.setValueAtTime(0, time);
-    this.output.gain.linearRampToValueAtTime(this.data.velocity, time + 0.01);
+    this.output.gain.linearRampToValueAtTime(this.data.velocity, time + 0.005);
 
     this.synth.start(time);
   };
@@ -131,7 +128,7 @@ export default class Note {
     // if the envelop is clean we should already be at 0 gain from env,
     // else we should avoid drity clicks
     this.output.gain.setValueAtTime(this.data.velocity, time);
-    this.output.gain.linearRampToValueAtTime(0, time + 0.01);
+    this.output.gain.linearRampToValueAtTime(0, time + 0.005);
 
     this.synth.stop(time + 0.01);
   };
