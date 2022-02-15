@@ -1,42 +1,47 @@
 import decibelToLinear from '../math/decibelToLinear';
+import linearToDecibel from '../math/linearToDecibel';
+import audioBusSchema from '../../../server/schemas/busControls'
 
 export default class AudioBus {
   constructor(audioContext, { panning = false, filter = false } = {}) {
     this.audioContext = audioContext;
 
+    this.params = audioBusSchema;
+    this.muteflag = this.params.mute.default; //can't rely on _mute value bc of the transition time 
+
     // parameters
     // @note - not sure this is a good idea finally
-    this.params = {
-      mute: {
-        type: 'boolean',
-        default: false,
-      },
-      volume: {
-        type: 'number',
-        min: -80.0,
-        max: 20.0,
-        default: 0.,
-      },
-      // optionnal
-      panning: {
-        type: 'number',
-        min: -1.0,
-        max: 1.0,
-        default: 0.0,
-      },
-      lowPassFreq: {
-        type: 'number',
-        min: 20.0,
-        max: 20000.0,
-        default: 20000.0,
-      },
-      highPassFreq: {
-        type: 'number',
-        min: 20.0,
-        max: 20000.0,
-        default: 20.0,
-      },
-    };
+    // this.params = {
+    //   mute: {
+    //     type: 'boolean',
+    //     default: false,
+    //   },
+    //   volume: {
+    //     type: 'number',
+    //     min: -80.0,
+    //     max: 20.0,
+    //     default: 0.,
+    //   },
+    //   // optionnal
+    //   panning: {
+    //     type: 'number',
+    //     min: -1.0,
+    //     max: 1.0,
+    //     default: 0.0,
+    //   },
+    //   lowPassFreq: {
+    //     type: 'number',
+    //     min: 20.0,
+    //     max: 20000.0,
+    //     default: 20000.0,
+    //   },
+    //   highPassFreq: {
+    //     type: 'number',
+    //     min: 20.0,
+    //     max: 20000.0,
+    //     default: 20.0,
+    //   },
+    // };
 
     // create graph
     this._output = this.audioContext.createGain();
@@ -118,10 +123,11 @@ export default class AudioBus {
   }
 
   get mute() {
-    return this._mute.value ? false : true;
+    return this.muteflag;
   }
 
   set mute(flag) {
+    this.muteflag = flag;
     const now = this.audioContext.currentTime;
     if (flag) {
       this._mute.gain.setTargetAtTime(0, now, 0.01);
@@ -131,7 +137,7 @@ export default class AudioBus {
   }
 
   get volume() {
-    return this._volume.gain.value;
+    return linearToDecibel(this._volume.gain.value);
   }
 
   set volume(db) {

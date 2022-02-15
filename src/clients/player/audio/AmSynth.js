@@ -87,6 +87,10 @@ export default class AmSynth {
     return this._carrier.detune;
   }
 
+  get carrFreq() {
+    return this.userParams.carrFreq.value;
+  }
+
   set carrFreq(f) {
     this.userParams.carrFreq.value = f;
     const now = this.audioContext.currentTime;
@@ -98,6 +102,10 @@ export default class AmSynth {
     this._carrier.type = type;
   }
 
+  get modFreq() {
+    return this.userParams.modFreq.value;
+  }
+
   set modFreq(f) {
     this.userParams.modFreq.value = f;
     const now = this.audioContext.currentTime;
@@ -107,6 +115,10 @@ export default class AmSynth {
   set modType(type) {
     this.userParams.modType.value = type;
     this._modulator.type = type;
+  }
+
+  get modDepth() {
+    return this.userParams.modDepth.value;
   }
 
   set modDepth(depth) {

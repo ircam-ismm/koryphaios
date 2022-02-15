@@ -69,6 +69,10 @@ export default class FmSynth {
     return this._carrier.detune;
   }
 
+  get carrFreq() {
+    return this.params.carrFreq.value;
+  }
+
   set carrFreq(f) {
     this.params.carrFreq.value = f;
 
@@ -82,6 +86,10 @@ export default class FmSynth {
     this.params.carrType.value = type;
 
     this._carrier.type = type;
+  }
+
+  get harmonicity() {
+    return this.params.harmonicity.value;
   }
 
   set harmonicity(r) {
@@ -99,7 +107,13 @@ export default class FmSynth {
     this._modulator.type = type;
   }
 
+  get modIndex() {
+    return this.params.modIndex.value;
+  } 
+
   set modIndex(val) {
+    const {min, max} = this.params.modIndex;
+    val = Math.min(max, Math.max(min, val));
     this.params.modIndex.value = val;
 
     const now = this.audioContext.currentTime;
