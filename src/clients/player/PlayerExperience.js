@@ -4,13 +4,12 @@ import renderInitializationScreens from '@soundworks/template-helpers/client/ren
 import masters from 'waves-masters';
 
 import AudioBus from './audio/AudioBus';
+import SineSynth from './audio/SineSynth';
+import FmSynth from './audio/FmSynth';
+import AmSynth from './audio/AmSynth';
+
 import StateMachine from './states/StateMachine.js';
 
-/*
-TODO : 
-
-- Enveloppe : !! difference between decibel/linear
-*/
 
 class PlayerExperience extends AbstractExperience {
   constructor(client, config, $container, audioContext) {
@@ -27,6 +26,7 @@ class PlayerExperience extends AbstractExperience {
     this.platform = this.require('platform');
     this.audioBufferLoader = this.require('audio-buffer-loader');
     this.filesystem = this.require('filesystem');
+    this.scripting = this.require('scripting');
 
     this.render = this.render.bind(this);
 
@@ -72,6 +72,76 @@ class PlayerExperience extends AbstractExperience {
     //   osc.start(now + index);
     //   osc.stop(now + index + 1);
     // });
+    
+    //constructors for synths
+    this.synthConstructors = {
+      'sine': SineSynth,
+      'am': AmSynth,
+      'fm': FmSynth,
+    }
+    
+
+    const defaultSynths = Object.keys(this.synthConstructors);
+
+    const list = this.scripting.getList();
+    for (let i = 0; i < list.length; i++) {
+      const scriptName = list[i];
+      if (!Object.keys(this.synthConstructors).includes(scriptName)) {
+        const script = await this.scripting.attach(scriptName);
+        const ctor = script.execute(script);
+        this.synthConstructors[scriptName] = ctor;
+
+        this.synthBuses[scriptName] = new AudioBus(this.audioContext, this.score.get('synthBusConfig'));
+        this.synthBuses[scriptName].connect(this.masterBus.input);
+
+        script.subscribe(updates => {
+          if (!updates.error) {
+            const ctor = script.execute();
+            this.synthConstructors[scriptName] = ctor;
+          }
+        });
+      }
+    } 
+
+    this.scripting.observe(async () => {
+      const scriptList = this.scripting.getList();
+      const existingSynths = Object.keys(this.synthConstructors);
+
+      //Adding new synths
+      for (let i = 0; i < scriptList.length; i++) {
+        const scriptName = scriptList[i];
+        if (!existingSynths.includes(scriptName)) {
+          const script = await this.scripting.attach(scriptName);
+          const ctor = script.execute(script);
+          this.synthConstructors[scriptName] = ctor;
+
+          this.synthBuses[scriptName] = new AudioBus(this.audioContext, this.score.get('synthBusConfig'));
+          this.synthBuses[scriptName].connect(this.masterBus.input);
+
+          script.subscribe(updates => {
+            if (!updates.error) {
+              const ctor = script.execute();
+              this.synthConstructors[scriptName] = ctor;
+            }
+          });
+        }
+      } 
+
+      //Deleting 
+      for (let i = 0; i < existingSynths.length; i++) {
+        const synthName = existingSynths[i];
+        if (!defaultSynths.includes(synthName) && !scriptList.includes(synthName)) {
+          delete this.synthConstructors[synthName];
+          delete this.synthBuses[synthName];
+        }
+      }
+
+      console.log(this.synthConstructors);
+    });
+
+
+    
+
 
     this.client.stateManager.observe(async (schemaName, stateId, nodeId) => {
       if (schemaName.includes("BusControls")) {

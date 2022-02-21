@@ -7,6 +7,7 @@ import ControllerExperience from './ControllerExperience.js';
 
 import pluginPlatformFactory from '@soundworks/plugin-platform/client';
 import pluginSyncFactory from '@soundworks/plugin-sync/client';
+import pluginScriptingFactory from '@soundworks/plugin-scripting/client';
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioContext = new AudioContext();
@@ -30,6 +31,7 @@ async function launch($container, index) {
       ]
     }, []);
     client.pluginManager.register('sync', pluginSyncFactory, {}, []);
+    client.pluginManager.register('scripting', pluginScriptingFactory, {}, []);
 
     // -------------------------------------------------------------------
     // launch application

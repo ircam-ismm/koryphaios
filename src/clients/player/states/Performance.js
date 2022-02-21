@@ -1,6 +1,6 @@
 import State from './State.js';
 import { html } from 'lit-html';
-import '@ircam/simple-components/sc-button.js';
+import '@ircam/simple-components/sc-bang.js';
 import Note from '../audio/Note.js';
 
 export default class Performance extends State {
@@ -23,8 +23,9 @@ export default class Performance extends State {
         const startTime = this.context.sync.getLocalTime(startSyncTime);
 
         for (let i = 0; i < notes.length; i++) {
-          const note = new Note(this.context.audioContext, notes[i]);
+          const note = new Note(this.context.audioContext, notes[i], this.context.synthConstructors);
           // use `note.data`, as it has been normalized with defaults
+          // const bus = this.context.synthBuses['sine'];
           const bus = this.context.synthBuses[note.data.synthType];
 
           note.connect(bus.input);

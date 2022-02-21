@@ -1,6 +1,3 @@
-import SineSynth from './SineSynth.js';
-import FmSynth from './FmSynth.js';
-import AmSynth from './AmSynth.js';
 import Envelope from './Envelope.js';
 import decibelToLinear from '../math/decibelToLinear.js';
 
@@ -26,19 +23,20 @@ let noteDefaults = {
   envelope: null,
   synthType: 'sine',
   amModFreq: 0,
-  amModDepths: 0,
+  amModDepth: 0,
   fmHarmonicity: 0,
   fmModIndex: 0,
 };
 
 export default class Note {
-  constructor(audioContext, data) {
+  constructor(audioContext, data, synthCtor) {
     this.audioContext = audioContext;
     this.data = data;
+    this.synthConstructors = synthCtor;
 
     // apply defaults
     for (let name in this.data) {
-      if (this.data[name] === null) {
+      if (this.data[name] === null || this.data[name] === undefined) {
         this.data[name] = noteDefaults[name];
       }
     }
@@ -60,37 +58,44 @@ export default class Note {
     this.env.gain.value = this.data.envelope !== null && this.data.envelope.length > 0 ? 0 : 1;
     this.env.connect(this.output);
 
-    switch (this.data.synthType) {
-      case 'sine':
-        this.synth = new SineSynth(this.audioContext);
-        this.synth.frequency = this.data.frequency;
-        break;
-      case 'am':
-        this.synth = new AmSynth(this.audioContext);
-        this.synth.carrFreq = this.data.frequency;
-        this.synth.modFreq = this.data.amModFreq;
-        this.synth.modDepth = this.data.amModDepth;
-        break;
-      case 'fm':
-        this.synth = new FmSynth(this.audioContext);
-        this.synth.carrFreq = this.data.frequency;
-        this.synth.harmonicity = this.data.fmHarmonicity;
-        this.synth.modIndex = this.data.fmModIndex;
-        break;
-      case 'granular':
-        break;
+
+    if (this.data.synthType === 'sine') {
+      const ctor = this.synthConstructors[this.data.synthType];
+      this.synth = new ctor(this.audioContext);
+      this.synth.frequency = this.data.frequency;
+    } else if (this.data.synthType === 'am') {
+      const ctor = this.synthConstructors[this.data.synthType];
+      this.synth = new ctor(this.audioContext);
+      this.synth.carrFreq = this.data.frequency;
+      this.synth.modFreq = this.data.amModFreq;
+      this.synth.modDepth = this.data.amModDepth;
+    } else if (this.data.synthType === 'fm') {
+      const ctor = this.synthConstructors[this.data.synthType];
+      this.synth = new ctor(this.audioContext);
+      this.synth.carrFreq = this.data.frequency;
+      this.synth.harmonicity = this.data.fmHarmonicity;
+      this.synth.modIndex = this.data.fmModIndex;
+    } else if (Object.keys(this.synthConstructors).includes(this.data.synthType)) {
+      const ctor = this.synthConstructors[this.data.synthType];
+      this.synth = new ctor(this.audioContext);
+      this.synth.frequency = this.data.frequency;
+    } else {
+      const ctor = this.synthConstructors[noteDefaults.synthType];
+      this.synth = new ctor(this.audioContext);
+      this.synth.frequency = this.data.frequency;
     }
 
     this.synth.connect(this.env);
 
-    // prepare en store all envelopes
+    // prepare to store all envelopes
     this.envelopes = [];
 
     const envelopes = {
       'detune': this.synth.detuneParam,
       'envelope': this.env.gain,
     }
-
+    
+    //Init enveloppes 
     for (let key in envelopes) {
       if (!(key in noteDefaults)) {
         console.log(`cannot schedule envelop for entry "${key}", does not exists`);

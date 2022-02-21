@@ -7,6 +7,8 @@ import '@ircam/simple-components/sc-toggle.js';
 import '@ircam/simple-components/sc-editor.js';
 import '@ircam/simple-components/sc-button.js';
 import '@ircam/simple-components/sc-text.js';
+import '@ircam/simple-components/sc-editor.js';
+import pluginScriptingFactory from '@soundworks/plugin-scripting/client';
 
 /*
 TODO: 
@@ -29,6 +31,7 @@ class ControllerExperience extends AbstractExperience {
 
     this.noteLogs = [];
     // require plugins if needed
+    this.scripting = this.require('scripting');
 
     renderInitializationScreens(client, config, $container);
   }
@@ -36,6 +39,7 @@ class ControllerExperience extends AbstractExperience {
   async start() {
     super.start();
 
+    this.scriptState = await this.client.stateManager.attach('script');
     this.score = await this.client.stateManager.attach('score');
 
     this.busStates = {};
@@ -43,10 +47,16 @@ class ControllerExperience extends AbstractExperience {
       if (schemaName.includes("BusControls")){
         const busState = await this.client.stateManager.attach(schemaName, stateId);
         const name = busState.get('name');
+        console.log(name);
 
         this.busStates[name] = busState;
 
         busState.subscribe(updates => this.render());
+
+        busState.onDetach(() => {
+          delete this.busStates[name]
+          this.render();
+        })
 
         this.render();
       }
@@ -66,6 +76,26 @@ class ControllerExperience extends AbstractExperience {
 
     this.render();
     window.addEventListener('resize', () => this.render());
+
+    //Scripting
+    this.scriptState.subscribe(async updates => {
+      if ('currentScript' in updates) {
+        if (updates.currentScript === null) {
+          if (this.currentScript) {
+            await this.currentScript.detach();
+            this.render();
+          }
+        } else {
+          this.updateCurrentScript(updates.currentScript);
+        }
+      }
+    });
+
+    // track script list updates
+    this.scripting.observe(() => this.render());
+
+    
+
 
     // MIDI bindings
     // @todo - test again
@@ -131,6 +161,110 @@ class ControllerExperience extends AbstractExperience {
       }
     }
   }
+
+  selectScript(scriptName) {
+    // we set the script using the globals state to propagate to all connected clients
+    this.scriptState.set({ currentScript: scriptName });
+  }
+
+  async createScript(scriptName) {
+    if (scriptName !== '') {
+      const defaultValue = `// script ${scriptName}
+function getSynth() {
+  return class CustomSynth {
+    constructor(audioContext) {
+      this.audioContext = audioContext;
+
+      // Array to store all sound sources
+      this.sources = [];
+
+      // Create nodes 
+      this.output = new GainNode(audioContext); 
+      this._osc = new OscillatorNode(audioContext);
+      this.sources.push(this._osc);
+
+      // Connect nodes to output
+      this._osc.connect(this.output);
+    }
+
+    get detuneParam() {
+      return this._osc.detune;
+    }
+
+    get frequency() {
+      return this._osc.frequency.value;
+    }
+
+    set frequency(value) {
+      const now = this.audioContext.currentTime;
+      this._osc.frequency.setTargetAtTime(value, now, 0.01);
+    }
+
+    connect(dest) {
+      this.output.connect(dest);
+    }
+
+    disconnect(dest) {
+      this.output.disconnect(dest);
+    }
+
+    start(time) {
+      this.sources.forEach(src => {src.start(time)});
+    }
+
+    stop(time) {
+      this.sources.forEach(src => {src.stop(time)});
+    }
+  }
+}`
+      // create the script, it will be available to all node
+      await this.scripting.create(scriptName, defaultValue);
+      this.selectScript(scriptName);
+    }
+  }
+
+  async deleteScript(scriptName) {
+    await this.scripting.delete(scriptName);
+
+    if (this.scriptState.get('currentScript') === scriptName) {
+      this.scriptState.set({ currentScript: null });
+    }
+
+    this.render();
+  }
+
+  setScriptValue(value) {
+    if (this.currentScript) {
+      this.currentScript.setValue(value);
+    }
+  }
+
+  async updateCurrentScript(scriptName) {
+    if (this.currentScript) {
+      await this.currentScript.detach();
+    }
+
+    this.currentScript = await this.scripting.attach(scriptName);
+
+    // subscribe to update and re-execete the script
+    this.currentScript.subscribe(updates => {
+      if (updates.error) {
+        const error = updates.error;
+        console.log(error);
+        // you may display errors on the screen
+      }
+      else {
+        this.render();
+      }
+    });
+
+    this.currentScript.onDetach(() => {
+      this.currentScript = undefined;
+      this.render();
+    });
+
+    this.render();
+  }   
 
   render() {
     render(html`
@@ -240,13 +374,12 @@ class ControllerExperience extends AbstractExperience {
 
         <!-- bus controls -->
         <div style="
-          width: calc(100vw - 40px - 300px - 40px);
-          height: 400px;
+          width: 500px;
           /*background-color: red;*/
           float: left;
           margin-left: 20px;
         ">
-          ${['master', 'sine', 'am', 'fm'].map(name => {
+          ${Object.keys(this.busStates).map(name => {
             const state = this.busStates[name];
             // state may not be ready yet
             if (!state) {
@@ -330,6 +463,54 @@ class ControllerExperience extends AbstractExperience {
             `;
           })}
         </div>
+
+        <!-- scripting -->
+        <div style="
+          width: 500px;
+          height: 90vh;
+          /*background-color: red;*/
+          float: left;
+          margin-left: 20px;
+        ">
+          <h1 style="padding: 0; margin: 20px 0px">plugin scripting</h1>
+          <section style="margin: 8px 0">
+            <sc-text
+              value="create script (cmd + s):"
+              readonly
+            ></sc-text>
+            <sc-text
+              @change="${e => this.createScript(e.detail.value)}"
+            ></sc-text>
+          </section>
+          ${this.scripting.getList().map((scriptName) => {
+            return html`
+              <section style="margin: 4px 0">
+                <sc-button
+                  value="${scriptName}"
+                  text="select ${scriptName}"
+                  @input="${() => this.selectScript(scriptName)}"
+                ></sc-button>
+                <sc-button
+                  value="${scriptName}"
+                  text="delete ${scriptName}"
+                  @input="${() => this.deleteScript(scriptName)}"
+                ></sc-button>
+              </section>
+            `;
+          })}
+          <sc-text
+            readonly
+            width="500"
+            value="open the console to see possible syntax errors when editing"
+          ></sc-text>
+          <sc-editor
+            style="display:block"
+            width="500"
+            height="500"
+            .value="${(this.currentScript && this.currentScript.getValue() || '')}"
+            @change="${e => this.setScriptValue(e.detail.value)}"
+          ></sc-editor>
+        </div>  
 
       </div>
 

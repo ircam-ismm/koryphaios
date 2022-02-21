@@ -4,6 +4,7 @@ class ControllerExperience extends AbstractExperience {
   constructor(server, clientTypes, options = {}) {
     super(server, clientTypes);
 
+    this.scripting = this.require('scripting');
   }
 
   start() {
