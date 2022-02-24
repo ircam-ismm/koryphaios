@@ -8,7 +8,6 @@ import '@ircam/simple-components/sc-editor.js';
 import '@ircam/simple-components/sc-button.js';
 import '@ircam/simple-components/sc-text.js';
 import '@ircam/simple-components/sc-editor.js';
-import pluginScriptingFactory from '@soundworks/plugin-scripting/client';
 
 /*
 TODO: 
@@ -31,7 +30,7 @@ class ControllerExperience extends AbstractExperience {
 
     this.noteLogs = [];
     // require plugins if needed
-    this.scripting = this.require('scripting');
+    this.synthScripting = this.require('synth-scripting');
 
     renderInitializationScreens(client, config, $container);
   }
@@ -39,7 +38,7 @@ class ControllerExperience extends AbstractExperience {
   async start() {
     super.start();
 
-    this.scriptState = await this.client.stateManager.attach('script');
+    this.synthScriptState = await this.client.stateManager.attach('script');
     this.score = await this.client.stateManager.attach('score');
 
     this.busStates = {};
@@ -78,11 +77,11 @@ class ControllerExperience extends AbstractExperience {
     window.addEventListener('resize', () => this.render());
 
     //Scripting
-    this.scriptState.subscribe(async updates => {
+    this.synthScriptState.subscribe(async updates => {
       if ('currentScript' in updates) {
         if (updates.currentScript === null) {
-          if (this.currentScript) {
-            await this.currentScript.detach();
+          if (this.currentSynthScript) {
+            await this.currentSynthScript.detach();
             this.render();
           }
         } else {
@@ -92,7 +91,7 @@ class ControllerExperience extends AbstractExperience {
     });
 
     // track script list updates
-    this.scripting.observe(() => this.render());
+    this.synthScripting.observe(() => this.render());
 
     
 
@@ -162,12 +161,12 @@ class ControllerExperience extends AbstractExperience {
     }
   }
 
-  selectScript(scriptName) {
+  selectSynthScript(scriptName) {
     // we set the script using the globals state to propagate to all connected clients
-    this.scriptState.set({ currentScript: scriptName });
+    this.synthScriptState.set({ currentScript: scriptName });
   }
 
-  async createScript(scriptName) {
+  async createSynthScript(scriptName) {
     if (scriptName !== '') {
       const defaultValue = `// script ${scriptName}
 function getSynth() {
@@ -218,36 +217,36 @@ function getSynth() {
   }
 }`
       // create the script, it will be available to all node
-      await this.scripting.create(scriptName, defaultValue);
-      this.selectScript(scriptName);
+      await this.synthScripting.create(scriptName, defaultValue);
+      this.selectSynthScript(scriptName);
     }
   }
 
-  async deleteScript(scriptName) {
-    await this.scripting.delete(scriptName);
+  async deleteSynthScript(scriptName) {
+    await this.synthScripting.delete(scriptName);
 
-    if (this.scriptState.get('currentScript') === scriptName) {
-      this.scriptState.set({ currentScript: null });
+    if (this.synthScriptState.get('currentScript') === scriptName) {
+      this.synthScriptState.set({ currentScript: null });
     }
 
     this.render();
   }
 
-  setScriptValue(value) {
-    if (this.currentScript) {
-      this.currentScript.setValue(value);
+  setSynthScriptValue(value) {
+    if (this.currentSynthScript) {
+      this.currentSynthScript.setValue(value);
     }
   }
 
   async updateCurrentScript(scriptName) {
-    if (this.currentScript) {
-      await this.currentScript.detach();
+    if (this.currentSynthScript) {
+      await this.currentSynthScript.detach();
     }
 
-    this.currentScript = await this.scripting.attach(scriptName);
+    this.currentSynthScript = await this.synthScripting.attach(scriptName);
 
     // subscribe to update and re-execete the script
-    this.currentScript.subscribe(updates => {
+    this.currentSynthScript.subscribe(updates => {
       if (updates.error) {
         const error = updates.error;
         console.log(error);
@@ -258,8 +257,8 @@ function getSynth() {
       }
     });
 
-    this.currentScript.onDetach(() => {
-      this.currentScript = undefined;
+    this.currentSynthScript.onDetach(() => {
+      this.currentSynthScript = undefined;
       this.render();
     });
 
@@ -479,21 +478,21 @@ function getSynth() {
               readonly
             ></sc-text>
             <sc-text
-              @change="${e => this.createScript(e.detail.value)}"
+              @change="${e => this.createSynthScript(e.detail.value)}"
             ></sc-text>
           </section>
-          ${this.scripting.getList().map((scriptName) => {
+          ${this.synthScripting.getList().map((scriptName) => {
             return html`
               <section style="margin: 4px 0">
                 <sc-button
                   value="${scriptName}"
                   text="select ${scriptName}"
-                  @input="${() => this.selectScript(scriptName)}"
+                  @input="${() => this.selectSynthScript(scriptName)}"
                 ></sc-button>
                 <sc-button
                   value="${scriptName}"
                   text="delete ${scriptName}"
-                  @input="${() => this.deleteScript(scriptName)}"
+                  @input="${() => this.deleteSynthScript(scriptName)}"
                 ></sc-button>
               </section>
             `;
@@ -507,8 +506,8 @@ function getSynth() {
             style="display:block"
             width="500"
             height="500"
-            .value="${(this.currentScript && this.currentScript.getValue() || '')}"
-            @change="${e => this.setScriptValue(e.detail.value)}"
+            .value="${(this.currentSynthScript && this.currentSynthScript.getValue() || '')}"
+            @change="${e => this.setSynthScriptValue(e.detail.value)}"
           ></sc-editor>
         </div>  
 

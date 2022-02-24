@@ -62,7 +62,7 @@ server.pluginManager.register('filesystem', pluginFilesystemFactory, {
     publicDirectory: 'soundbank',
   }],
 }, []);
-server.pluginManager.register('scripting', pluginScriptingFactory, {
+server.pluginManager.register('synth-scripting', pluginScriptingFactory, {
   // default to `.data/scripts`
   directory: 'src/clients/player/audio/user_scripts', //also written in script schema
 }, []);
@@ -98,7 +98,7 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
     });
 
     const sync = server.pluginManager.get('sync');
-    const scripting = server.pluginManager.get('scripting');
+    const synthScripting = server.pluginManager.get('synth-scripting');
 
     const score = await server.stateManager.create('score', {
       piece: config.app.piece, 
@@ -107,7 +107,7 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
       dispatchStrategies: Object.keys(dispatchStrategies),
     });
 
-    const script = await server.stateManager.create('script');
+    const synthScript = await server.stateManager.create('script');
 
     const busStates = {};
     // this is a good example for state-manager-osc improvements
@@ -283,7 +283,7 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
     await oscStateManager.init();
 
     //Create new bus in case of custom scripts
-    const list = scripting.getList();
+    const list = synthScripting.getList();
     for (let i = 0; i < list.length; i++) {
       const scriptName = list[i];
       if (!Object.keys(busStates).includes(scriptName)) {
@@ -295,7 +295,7 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
       }
     }
 
-    scripting.observe(async () => {
+    synthScripting.observe(async () => {
       const scriptList = scripting.getList();
       const existingSynths = Object.keys(busStates);
       const defaultSynths = ['sine', 'am', 'fm'];

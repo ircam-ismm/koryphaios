@@ -27,10 +27,10 @@ export default class Playground extends State {
     this.fmBus = new AudioBus(this.context.audioContext);
     this.fmBus.mute = true;
 
-
     this.sineSynth = new SineSynth(this.context.audioContext);
     this.amSynth = new AmSynth(this.context.audioContext);
     this.fmSynth = new FmSynth(this.context.audioContext);
+
 
     this.output.connect(this.context.audioContext.destination);
 
@@ -41,6 +41,8 @@ export default class Playground extends State {
     this.sineSynth.connect(this.sineBus.input);
     this.amSynth.connect(this.amBus.input);
     this.fmSynth.connect(this.fmBus.input);
+
+
   }
 
   start() {
@@ -256,6 +258,7 @@ export default class Playground extends State {
           ></sc-slider>
         </div>
       </div>
+
     `;
   }
 }

@@ -34,37 +34,49 @@ export default class AmSynth {
     };
 
     // create graph
-    this._output = this.audioContext.createGain();
+    this._output = new GainNode(this.audioContext);
 
-    this._carrier = this.audioContext.createOscillator();
+    this._modulated = new GainNode(this.audioContext);
+    
+    this._carrier = new OscillatorNode(this.audioContext);
     this._carrier.frequency.value = this.userParams.carrFreq.default;
     this._carrier.type = this.userParams.carrType.default;
 
-    this._modulator = this.audioContext.createOscillator();
-    this._modulator.frequency.value = this.userParams.modFreq.default;
-    this._modulator.type = this.userParams.modType.default;
-
-    this._depth = this.audioContext.createGain();
-    this._depth.gain.value = this.userParams.modDepth.default;
-
-    // no need for this one
-    this._offset = this.audioContext.createConstantSource();
-    this._offset.offset.value = 1 - this.userParams.modDepth.default;
-
-    this._scale = this.audioContext.createGain();
+    this._scale = new GainNode(this.audioContext);
     this._scale.gain.value = 0.5;
 
-    this._modulated = this.audioContext.createGain();
+    this._depth = new GainNode(this.audioContext);
+    this._depth.gain.value = 0;
 
-    this.modDepth = 0;
+    this._modulator = new OscillatorNode(this.audioContext);
+    this._modulator.frequency.value = 0;
+    this._modulator.type = this.userParams.modType.default;
 
-    this._carrier.connect(this._modulated);
-    this._modulated.connect(this._output);
+    this._modFreqConst = new ConstantSourceNode(this.audioContext);
+    this._modFreqConst.offset.value = this.userParams.modFreq.default;
+
+    this._offset = new ConstantSourceNode(this.audioContext);
+    this._offset.offset.value = 1;
+
+    this._gainMinus = new GainNode(this.audioContext);
+    this._gainMinus.gain.value = -1;
+
+    this._modDepthConst = new ConstantSourceNode(this.audioContext);
+    this._modDepthConst.offset.value = this.userParams.modDepth.default;
+
     
-    this._modulator.connect(this._depth);
-    this._depth.connect(this._scale);
-    this._offset.connect(this._scale);
+    this._modulated.connect(this._output);
+    this._carrier.connect(this._modulated);
+    
     this._scale.connect(this._modulated.gain);
+    this._depth.connect(this._scale);
+    this._modulator.connect(this._depth);
+    this._modFreqConst.connect(this._modulator.frequency);
+    
+    this._offset.connect(this._scale);
+    this._gainMinus.connect(this._offset.offset);
+    this._modDepthConst.connect(this._gainMinus);
+    this._modDepthConst.connect(this._depth.gain);
   }
 
   connect(dest) {
@@ -75,12 +87,16 @@ export default class AmSynth {
     this._carrier.start(time);
     this._modulator.start(time);
     this._offset.start(time);
+    this._modFreqConst.start(time);
+    this._modDepthConst.start(time);
   }
 
   stop(time) {
     this._carrier.stop(time);
     this._modulator.stop(time);
     this._offset.stop(time);
+    this._modFreqConst.stop(time);
+    this._modDepthConst.stop(time);
   }
 
   get detuneParam() {
@@ -102,6 +118,10 @@ export default class AmSynth {
     this._carrier.type = type;
   }
 
+  get modFreqParam() {
+    return this._modFreqConst.offset;
+  }
+
   get modFreq() {
     return this.userParams.modFreq.value;
   }
@@ -109,7 +129,7 @@ export default class AmSynth {
   set modFreq(f) {
     this.userParams.modFreq.value = f;
     const now = this.audioContext.currentTime;
-    this._modulator.frequency.setTargetAtTime(f, now, 0.01);
+    this._modFreqConst.offset.setTargetAtTime(f, now, 0.01);
   }
 
   set modType(type) {
@@ -117,15 +137,21 @@ export default class AmSynth {
     this._modulator.type = type;
   }
 
+  get modDepthParam() {
+    return this._modFreqConst.offset;
+  }
+
   get modDepth() {
     return this.userParams.modDepth.value;
   }
 
   set modDepth(depth) {
+    const { min, max } = this.userParams.modDepth;
+    depth = Math.min(max, Math.max(min, depth));
     this.userParams.modDepth.value = depth;
+
     const now = this.audioContext.currentTime;
-    this._depth.gain.setTargetAtTime(depth, now, 0.01);
-    this._offset.offset.setTargetAtTime(1-depth, now, 0.01);
+    this._modDepthConst.offset.setTargetAtTime(depth, now, 0.01);
   }
 
 }

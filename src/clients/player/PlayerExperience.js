@@ -26,7 +26,7 @@ class PlayerExperience extends AbstractExperience {
     this.platform = this.require('platform');
     this.audioBufferLoader = this.require('audio-buffer-loader');
     this.filesystem = this.require('filesystem');
-    this.scripting = this.require('scripting');
+    this.synthScripting = this.require('synth-scripting');
 
     this.render = this.render.bind(this);
 
@@ -83,11 +83,11 @@ class PlayerExperience extends AbstractExperience {
 
     const defaultSynths = Object.keys(this.synthConstructors);
 
-    const list = this.scripting.getList();
+    const list = this.synthScripting.getList();
     for (let i = 0; i < list.length; i++) {
       const scriptName = list[i];
       if (!Object.keys(this.synthConstructors).includes(scriptName)) {
-        const script = await this.scripting.attach(scriptName);
+        const script = await this.synthScripting.attach(scriptName);
         const ctor = script.execute(script);
         this.synthConstructors[scriptName] = ctor;
 
@@ -103,15 +103,15 @@ class PlayerExperience extends AbstractExperience {
       }
     } 
 
-    this.scripting.observe(async () => {
-      const scriptList = this.scripting.getList();
+    this.synthScripting.observe(async () => {
+      const scriptList = this.synthScripting.getList();
       const existingSynths = Object.keys(this.synthConstructors);
 
       //Adding new synths
       for (let i = 0; i < scriptList.length; i++) {
         const scriptName = scriptList[i];
         if (!existingSynths.includes(scriptName)) {
-          const script = await this.scripting.attach(scriptName);
+          const script = await this.synthScripting.attach(scriptName);
           const ctor = script.execute(script);
           this.synthConstructors[scriptName] = ctor;
 
