@@ -59,6 +59,13 @@ export default class Note {
     this.env.connect(this.output);
 
 
+    // prepare to store all envelopes
+    this.envelopes = [];
+
+    const envelopes = {
+      'envelope': this.env.gain,
+    }
+
     if (this.data.synthType === 'sine') {
       const ctor = this.synthConstructors[this.data.synthType];
       this.synth = new ctor(this.audioContext);
@@ -67,14 +74,18 @@ export default class Note {
       const ctor = this.synthConstructors[this.data.synthType];
       this.synth = new ctor(this.audioContext);
       this.synth.carrFreq = this.data.frequency;
-      this.synth.modFreq = this.data.amModFreq;
-      this.synth.modDepth = this.data.amModDepth;
+      this.synth.modFreq = this.data.amModFreq !== null && this.data.amModFreq.length > 0 ? 0 : this.data.amModFreq;
+      this.synth.modDepth = this.data.amModDepth !== null && this.data.amModDepth.length > 0 ? 0 : this.data.amModDepth;
+      envelopes['amModFreq'] = this.synth.modFreqParam;
+      envelopes['amModDepth'] = this.synth.modDepthParam;
     } else if (this.data.synthType === 'fm') {
       const ctor = this.synthConstructors[this.data.synthType];
       this.synth = new ctor(this.audioContext);
       this.synth.carrFreq = this.data.frequency;
-      this.synth.harmonicity = this.data.fmHarmonicity;
-      this.synth.modIndex = this.data.fmModIndex;
+      this.synth.harmonicity = this.data.fmHarmonicity !== null && this.data.fmHarmonicity.length > 0 ? 0 : this.data.fmHarmonicity;
+      this.synth.modIndex = this.data.fmModIndex !== null && this.data.fmModIndex.length > 0 ? 0 : this.data.fmModIndex;
+      envelopes['fmHarmonicity'] = this.synth.harmonicityParam;
+      envelopes['fmModIndex'] = this.synth.modIndexParam;
     } else if (Object.keys(this.synthConstructors).includes(this.data.synthType)) {
       const ctor = this.synthConstructors[this.data.synthType];
       this.synth = new ctor(this.audioContext);
@@ -87,13 +98,7 @@ export default class Note {
 
     this.synth.connect(this.env);
 
-    // prepare to store all envelopes
-    this.envelopes = [];
-
-    const envelopes = {
-      'detune': this.synth.detuneParam,
-      'envelope': this.env.gain,
-    }
+    envelopes['detune'] = this.synth.detuneParam;
     
     //Init enveloppes 
     for (let key in envelopes) {

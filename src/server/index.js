@@ -175,19 +175,36 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
         // format lisp like lists from Bach
         for (let [key, value] of Object.entries(chord)) {
           if (Array.isArray(value) && value[0] === '[') {
-            for (let i = 0; i < value.length - 1; i++) {
-              if (value[i] != '[' && value[i] != ',' && value[i + 1] !== ']') {
-                value.splice(i + 1, 0, ',');
+            if (value[1] === '[') {
+              console.log(key);
+              for (let i = 0; i < value.length - 1; i++) {
+                if (value[i] != '[' && value[i] != ',' && value[i + 1] !== ']') {
+                  value.splice(i + 1, 0, ',');
+                }
               }
-            }
 
-            value = `[${value.join('')}]`;
-            chord[key] = JSON.parse(value);
+              value = `[${value.join('')}]`;
+
+              chord[key] = JSON.parse(value);
+            } else {
+              let i = 0;
+              while (i < value.length) {
+                if (value[i] === '[' || value[i] === ']') {
+                  value.splice(i, 1);
+                } else {
+                  i++;
+                }
+              }
+              
+              chord[key] = value;
+
+            }
           } else if (!Array.isArray(value) && value !== null) {
             // if single note in the chord, make it an array so we are generic after this point
             chord[key] = [value];
           }
         }
+
 
         const notes = []; // formatted notes
         let numNotes = null;
@@ -204,6 +221,7 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
           const note = {};
 
           for (let [key, value] of Object.entries(chord)) {
+            // note[key] = value === [] ? null : value
             note[key] = value === null ? null : value[i] ? value[i] : null;
           }
           
@@ -240,7 +258,7 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
       if ('defaultSynth' in updates) {
         // Info received from markers in bach, keep only existing synth as user
         // may use markers for other purpose
-        const availableSynth = ['sine', 'am', 'fm'].concat(scripting.getList());
+        const availableSynth = ['sine', 'am', 'fm'].concat(synthScripting.getList());
         if (!availableSynth.includes(updates.defaultSynth)) {
           return {
             ...updates,
