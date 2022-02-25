@@ -79,6 +79,7 @@ server.stateManager.registerSchema('masterBusControls', busControlsSchema);
 server.stateManager.registerSchema('sineBusControls', busControlsSchema);
 server.stateManager.registerSchema('amBusControls', busControlsSchema);
 server.stateManager.registerSchema('fmBusControls', busControlsSchema);
+server.stateManager.registerSchema('bufferBusControls', busControlsSchema);
 
 (async function launch() {
   try {
@@ -129,7 +130,12 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
     const fmBusControls = await server.stateManager.create('fmBusControls', {
       name: 'fm',
     });
-    busStates['fm'] = fmBusControls;
+    busStates['fm'] = fmBusControls; 
+
+    const bufferBusControls = await server.stateManager.create('bufferBusControls', {
+      name: 'buffer',
+    });
+    busStates['buffer'] = bufferBusControls; 
 
 
     const playerExperience = new PlayerExperience(server, 'player');

@@ -141,7 +141,7 @@ class ControllerExperience extends AbstractExperience {
       device.addEventListener('midimessage', getMIDIMessage);
     }
 
-    const synths = ['global', 'sine', 'am', 'fm'];
+    const synths = ['global', 'sine', 'am', 'fm', 'buffer'];
     const controls = ['mute', 'volume', 'lowPassFreq', 'highPassFreq'];
 
     for (const synth of synths) {
