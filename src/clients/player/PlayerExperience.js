@@ -7,6 +7,7 @@ import AudioBus from './audio/AudioBus';
 import SineSynth from './audio/SineSynth';
 import FmSynth from './audio/FmSynth';
 import AmSynth from './audio/AmSynth';
+import BufferSynth from './audio/BufferSynth';
 
 import StateMachine from './states/StateMachine.js';
 
@@ -56,7 +57,7 @@ class PlayerExperience extends AbstractExperience {
     // bus for each synths
     this.synthBuses = {};
 
-    ['sine', 'am', 'fm'].forEach(synthType => {
+    ['sine', 'am', 'fm', 'buffer'].forEach(synthType => {
       this.synthBuses[synthType] = new AudioBus(this.audioContext, this.score.get('synthBusConfig'));
       this.synthBuses[synthType].connect(this.masterBus.input);
     });
@@ -78,6 +79,7 @@ class PlayerExperience extends AbstractExperience {
       'sine': SineSynth,
       'am': AmSynth,
       'fm': FmSynth,
+      'buffer': BufferSynth,
     }
     
 

@@ -104,11 +104,11 @@
     return this._carrier.detune;
   }
 
-  get carrFreq() {
+    get frequency() {
     return this.params.carrFreq.value;
   }
 
-  set carrFreq(f) {
+    set frequency(f) {
     this.params.carrFreq.value = f;
 
     const now = this.audioContext.currentTime;

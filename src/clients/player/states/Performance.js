@@ -23,7 +23,7 @@ export default class Performance extends State {
         const startTime = this.context.sync.getLocalTime(startSyncTime);
 
         for (let i = 0; i < notes.length; i++) {
-          const note = new Note(this.context.audioContext, notes[i], this.context.synthConstructors);
+          const note = new Note(this.context.audioContext, notes[i], this.context.synthConstructors, this.context.audioBufferLoader);
           // use `note.data`, as it has been normalized with defaults
           // const bus = this.context.synthBuses['sine'];
           const bus = this.context.synthBuses[note.data.synthType];

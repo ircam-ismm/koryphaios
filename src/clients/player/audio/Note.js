@@ -1,5 +1,6 @@
 import Envelope from './Envelope.js';
 import decibelToLinear from '../math/decibelToLinear.js';
+import BufferSynth from './BufferSynth.js';
 
 // example note data
 //   {
@@ -29,7 +30,7 @@ let noteDefaults = {
 };
 
 export default class Note {
-  constructor(audioContext, data, synthCtor) {
+  constructor(audioContext, data, synthCtor, audioBufferLoader) {
     this.audioContext = audioContext;
     this.data = data;
     this.synthConstructors = synthCtor;
@@ -41,9 +42,16 @@ export default class Note {
       }
     }
 
+    if (!(Object.keys(this.synthConstructors).includes(this.data.synthType))) {
+      this.data.synthType = noteDefaults.synthType;
+    }
+
+
     // normalize eveything
     ['envelope'].forEach(key => {
-      this.data[key].forEach(point => point[1] = decibelToLinear(point[1]));
+      if (this.data[key] !== null) {
+        this.data[key].forEach(point => point[1] = decibelToLinear(point[1]));
+      }  
     });
 
     this.data.velocity = decibelToLinear(this.data.velocity);
@@ -66,34 +74,23 @@ export default class Note {
       'envelope': this.env.gain,
     }
 
-    if (this.data.synthType === 'sine') {
-      const ctor = this.synthConstructors[this.data.synthType];
-      this.synth = new ctor(this.audioContext);
-      this.synth.frequency = this.data.frequency;
-    } else if (this.data.synthType === 'am') {
-      const ctor = this.synthConstructors[this.data.synthType];
-      this.synth = new ctor(this.audioContext);
-      this.synth.carrFreq = this.data.frequency;
+    const ctor = this.synthConstructors[this.data.synthType];
+    this.synth = new ctor(this.audioContext);
+    this.synth.frequency = this.data.frequency;
+
+    if (this.data.synthType === 'am') {
       this.synth.modFreq = this.data.amModFreq !== null && this.data.amModFreq.length > 0 ? 0 : this.data.amModFreq;
       this.synth.modDepth = this.data.amModDepth !== null && this.data.amModDepth.length > 0 ? 0 : this.data.amModDepth;
       envelopes['amModFreq'] = this.synth.modFreqParam;
       envelopes['amModDepth'] = this.synth.modDepthParam;
     } else if (this.data.synthType === 'fm') {
-      const ctor = this.synthConstructors[this.data.synthType];
-      this.synth = new ctor(this.audioContext);
-      this.synth.carrFreq = this.data.frequency;
       this.synth.harmonicity = this.data.fmHarmonicity !== null && this.data.fmHarmonicity.length > 0 ? 0 : this.data.fmHarmonicity;
       this.synth.modIndex = this.data.fmModIndex !== null && this.data.fmModIndex.length > 0 ? 0 : this.data.fmModIndex;
       envelopes['fmHarmonicity'] = this.synth.harmonicityParam;
       envelopes['fmModIndex'] = this.synth.modIndexParam;
-    } else if (Object.keys(this.synthConstructors).includes(this.data.synthType)) {
-      const ctor = this.synthConstructors[this.data.synthType];
-      this.synth = new ctor(this.audioContext);
-      this.synth.frequency = this.data.frequency;
-    } else {
-      const ctor = this.synthConstructors[noteDefaults.synthType];
-      this.synth = new ctor(this.audioContext);
-      this.synth.frequency = this.data.frequency;
+    } else if (this.data.synthType === 'buffer') {
+      const buffer = audioBufferLoader.data[this.data.buffer];
+      this.synth.buffer = buffer;
     }
 
     this.synth.connect(this.env);

@@ -3,7 +3,7 @@ export default class GranularSynth {
     this.audioContext = audioContext;
     this.buffer = buffer;
 
-    // audo graph
+    // audio graph
     this._output = this.audioContext.createGain();
     this.engine = new GranularEngine(this.audioContext, this.buffer);
     this.engine.connect(this._output);

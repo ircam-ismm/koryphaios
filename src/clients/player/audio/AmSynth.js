@@ -103,11 +103,11 @@ export default class AmSynth {
     return this._carrier.detune;
   }
 
-  get carrFreq() {
+  get frequency() {
     return this.userParams.carrFreq.value;
   }
 
-  set carrFreq(f) {
+  set frequency(f) {
     this.userParams.carrFreq.value = f;
     const now = this.audioContext.currentTime;
     this._carrier.frequency.setTargetAtTime(f, now, 0.01);

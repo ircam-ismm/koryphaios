@@ -176,7 +176,6 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
         for (let [key, value] of Object.entries(chord)) {
           if (Array.isArray(value) && value[0] === '[') {
             if (value[1] === '[') {
-              console.log(key);
               for (let i = 0; i < value.length - 1; i++) {
                 if (value[i] != '[' && value[i] != ',' && value[i + 1] !== ']') {
                   value.splice(i + 1, 0, ',');
@@ -222,7 +221,7 @@ server.stateManager.registerSchema('fmBusControls', busControlsSchema);
 
           for (let [key, value] of Object.entries(chord)) {
             // note[key] = value === [] ? null : value
-            note[key] = value === null ? null : value[i] ? value[i] : null;
+            note[key] = value === null ? null : value[i] !== undefined ? value[i] : null;// to check
           }
           
           if (note.synthType === null) {
