@@ -203,7 +203,9 @@ server.stateManager.registerSchema('bufferBusControls', busControlsSchema);
             } else {
               let i = 0;
               while (i < value.length) {
-                if (value[i] === '[' || value[i] === ']') {
+                if (value[i] === '[' && value[i+1] === ']') {
+                  value.splice(i, 2, null);
+                } else if (value[i] === '[' || value[i] === ']') {
                   value.splice(i, 1);
                 } else {
                   i++;
@@ -234,10 +236,13 @@ server.stateManager.registerSchema('bufferBusControls', busControlsSchema);
           // maybe could be more generic? e.g.:
           const note = {};
 
+          
           for (let [key, value] of Object.entries(chord)) {
             // note[key] = value === [] ? null : value
             note[key] = value === null ? null : value[i] !== undefined ? value[i] : null;// to check
           }
+
+          
           
           if (note.synthType === null) {
             note.synthType = score.get('defaultSynth');
