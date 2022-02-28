@@ -24,7 +24,7 @@ import pluginScriptingFactory from '@soundworks/plugin-scripting/server';
 import PlayerExperience from './PlayerExperience.js';
 import ControllerExperience from './ControllerExperience.js';
 
-import dispatchStrategies from './dispatchStrategies.js';
+import defaultDispatchStrategies from './dispatchStrategies.js';
 
 import getConfig from '../utils/getConfig.js';
 
@@ -66,6 +66,10 @@ server.pluginManager.register('synth-scripting', pluginScriptingFactory, {
   // default to `.data/scripts`
   directory: 'src/clients/player/audio/user_scripts', //also written in script schema
 }, []);
+server.pluginManager.register('dispatch-scripting', pluginScriptingFactory, {
+  // default to `.data/scripts`
+  directory: 'src/clients/controller/dispatch_scripts', //also written in script schema
+}, []);
 
 
 // -------------------------------------------------------------------
@@ -74,7 +78,8 @@ server.pluginManager.register('synth-scripting', pluginScriptingFactory, {
 // server.stateManager.registerSchema(name, schema);
 server.stateManager.registerSchema('score', scoreSchema);
 server.stateManager.registerSchema('player', playerSchema);
-server.stateManager.registerSchema('script', scriptSchema);
+server.stateManager.registerSchema('synth-script', scriptSchema);
+server.stateManager.registerSchema('dispatch-script', scriptSchema);
 server.stateManager.registerSchema('masterBusControls', busControlsSchema);
 server.stateManager.registerSchema('sineBusControls', busControlsSchema);
 server.stateManager.registerSchema('amBusControls', busControlsSchema);
@@ -100,6 +105,9 @@ server.stateManager.registerSchema('bufferBusControls', busControlsSchema);
 
     const sync = server.pluginManager.get('sync');
     const synthScripting = server.pluginManager.get('synth-scripting');
+    const dispatchScripting = server.pluginManager.get('dispatch-scripting');
+
+    const dispatchStrategies = {...defaultDispatchStrategies};
 
     const score = await server.stateManager.create('score', {
       piece: config.app.piece, 
@@ -108,7 +116,8 @@ server.stateManager.registerSchema('bufferBusControls', busControlsSchema);
       dispatchStrategies: Object.keys(dispatchStrategies),
     });
 
-    const synthScript = await server.stateManager.create('script');
+    const synthScript = await server.stateManager.create('synth-script');
+    const dispatchScript = await server.stateManager.create('dispatch-script');
 
     const busStates = {};
     // this is a good example for state-manager-osc improvements
@@ -305,10 +314,48 @@ server.stateManager.registerSchema('bufferBusControls', busControlsSchema);
     const oscStateManager = new StateManagerOsc(server.stateManager, oscConfig);
     await oscStateManager.init();
 
-    //Create new bus in case of custom scripts
-    const list = synthScripting.getList();
-    for (let i = 0; i < list.length; i++) {
-      const scriptName = list[i];
+
+    // Add custom dispatch strategies 
+    const dispatchList = dispatchScripting.getList();
+    for (let i = 0; i < dispatchList.length; i++) {
+      const scriptName = dispatchList[i];
+      if (!Object.keys(dispatchStrategies).includes(scriptName)) {
+        const script = await dispatchScripting.attach(scriptName);
+        const dispatchFunc = script.execute();
+        dispatchStrategies[scriptName] = dispatchFunc;
+      }
+    }
+    score.set({dispatchStrategies : Object.keys(dispatchStrategies)});
+
+    dispatchScripting.observe(async () => {
+      const dispatchList = dispatchScripting.getList();
+      const existingStrat = Object.keys(dispatchStrategies);
+      const defaultStrategies = Object.keys(defaultDispatchStrategies);
+
+      for (let i = 0; i < dispatchList.length; i++) {
+        const scriptName = dispatchList[i];
+        if (!existingStrat.includes(scriptName)) {
+          const script = await dispatchScripting.attach(scriptName);
+          const dispatchFunc = script.execute();
+          dispatchStrategies[scriptName] = dispatchFunc;
+        }
+      }
+
+      for (let i = 0; i < existingStrat.length; i++) {
+        const scriptName = existingStrat[i];
+        if (!defaultStrategies.includes(scriptName) && !dispatchList.includes(scriptName)) {
+          delete dispatchStrategies[scriptName];
+        }
+      }
+
+      score.set({ dispatchStrategies: Object.keys(dispatchStrategies) });
+    });
+
+
+    // Create new bus in case of custom synth scripts
+    const synthList = synthScripting.getList();
+    for (let i = 0; i < synthList.length; i++) {
+      const scriptName = synthList[i];
       if (!Object.keys(busStates).includes(scriptName)) {
         server.stateManager.registerSchema(`${scriptName}BusControls`, busControlsSchema);
         const scriptBusControls = await server.stateManager.create(`${scriptName}BusControls`, {
@@ -319,12 +366,12 @@ server.stateManager.registerSchema('bufferBusControls', busControlsSchema);
     }
 
     synthScripting.observe(async () => {
-      const scriptList = scripting.getList();
+      const synthList = synthScripting.getList();
       const existingSynths = Object.keys(busStates);
       const defaultSynths = ['sine', 'am', 'fm'];
 
-      for (let i = 0; i < scriptList.length; i++) {
-        const scriptName = scriptList[i];
+      for (let i = 0; i < synthList.length; i++) {
+        const scriptName = synthList[i];
         if (!existingSynths.includes(scriptName)) {
           server.stateManager.registerSchema(`${scriptName}BusControls`, busControlsSchema);
           const scriptBusControls = await server.stateManager.create(`${scriptName}BusControls`, {
@@ -336,7 +383,7 @@ server.stateManager.registerSchema('bufferBusControls', busControlsSchema);
 
       for (let i = 0; i < existingSynths.length; i++) {
         const synthName = existingSynths[i];
-        if (!defaultSynths.includes(synthName) && !scriptList.includes(synthName)) {
+        if (!defaultSynths.includes(synthName) && !synthList.includes(synthName)) {
           delete busStates[synthName];
           server.stateManager.deleteSchema(`${synthName}BusControls`);
         }

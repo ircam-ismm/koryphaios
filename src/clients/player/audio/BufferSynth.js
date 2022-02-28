@@ -19,15 +19,28 @@ export default class BufferSynth {
   }
 
   get frequency() {
-    return this._bufferNode.playbackRate.value*this.baseFrequency;
+    // return this._bufferNode.playbackRate.value*this.baseFrequency;
   }
 
   set frequency(value) {
-    const pbRate = value/this.baseFrequency;
+    // const pbRate = value/this.baseFrequency;
 
-    const now = this.audioContext.currentTime;
-    this._bufferNode.playbackRate.setTargetAtTime(pbRate, now, 0.01);
+    // const now = this.audioContext.currentTime;
+    // this._bufferNode.playbackRate.setTargetAtTime(pbRate, now, 0.01);
   }
+
+  get playbackRateParam() {
+    return this._bufferNode.playbackRate
+  }
+
+  get playbackRate() {
+    return this._bufferNode.playbackRate.value;
+  }
+
+  set playbackRate(value) {
+    this._bufferNode.playbackRate.setTargetAtTime(value, now, 0.01);
+  }
+
 
   connect(dest) {
     this._output.connect(dest);

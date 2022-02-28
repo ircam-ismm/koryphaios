@@ -27,6 +27,7 @@ let noteDefaults = {
   amModDepth: 0,
   fmHarmonicity: 0,
   fmModIndex: 0,
+  bufferPlaybackRate: 1,
 };
 
 export default class Note {
@@ -91,6 +92,7 @@ export default class Note {
     } else if (this.data.synthType === 'buffer') {
       const buffer = audioBufferLoader.data[this.data.buffer];
       this.synth.buffer = buffer;
+      this.synth.playbackRate = this.data.bufferPlaybackRate;
     }
 
     this.synth.connect(this.env);

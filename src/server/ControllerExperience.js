@@ -5,6 +5,7 @@ class ControllerExperience extends AbstractExperience {
     super(server, clientTypes);
 
     this.synthScripting = this.require('synth-scripting');
+    this.dispatchScripting = this.require('dispatch-scripting');
   }
 
   start() {

@@ -32,6 +32,7 @@ async function launch($container, index) {
     }, []);
     client.pluginManager.register('sync', pluginSyncFactory, {}, []);
     client.pluginManager.register('synth-scripting', pluginScriptingFactory, {}, []);
+    client.pluginManager.register('dispatch-scripting', pluginScriptingFactory, {}, []);
 
     // -------------------------------------------------------------------
     // launch application

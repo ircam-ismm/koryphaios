@@ -31,6 +31,7 @@ class ControllerExperience extends AbstractExperience {
     this.noteLogs = [];
     // require plugins if needed
     this.synthScripting = this.require('synth-scripting');
+    this.dispatchScripting = this.require('dispatch-scripting');
 
     renderInitializationScreens(client, config, $container);
   }
@@ -38,7 +39,8 @@ class ControllerExperience extends AbstractExperience {
   async start() {
     super.start();
 
-    this.synthScriptState = await this.client.stateManager.attach('script');
+    this.synthScriptState = await this.client.stateManager.attach('synth-script');
+    this.dispatchScriptState = await this.client.stateManager.attach('dispatch-script');
     this.score = await this.client.stateManager.attach('score');
 
     this.busStates = {};
@@ -85,15 +87,27 @@ class ControllerExperience extends AbstractExperience {
             this.render();
           }
         } else {
-          this.updateCurrentScript(updates.currentScript);
+          this.updateCurrentSynthScript(updates.currentScript);
+        }
+      }
+    });
+
+    this.dispatchScriptState.subscribe(async updates => {
+      if ('currentScript' in updates) {
+        if (updates.currentScript === null) {
+          if (this.currentDispatchScript) {
+            await this.currentDispatchScript.detach();
+            this.render();
+          }
+        } else {
+          this.updateCurrentDispatchScript(updates.currentScript);
         }
       }
     });
 
     // track script list updates
     this.synthScripting.observe(() => this.render());
-
-    
+    this.dispatchScripting.observe(() => this.render());
 
 
     // MIDI bindings
@@ -238,7 +252,7 @@ function getSynth() {
     }
   }
 
-  async updateCurrentScript(scriptName) {
+  async updateCurrentSynthScript(scriptName) {
     if (this.currentSynthScript) {
       await this.currentSynthScript.detach();
     }
@@ -264,6 +278,73 @@ function getSynth() {
 
     this.render();
   }   
+
+
+
+  selectDispatchScript(scriptName) {
+    // we set the script using the globals state to propagate to all connected clients
+    this.dispatchScriptState.set({ currentScript: scriptName });
+  }
+
+  async createDispatchScript(scriptName) {
+    if (scriptName !== '') {
+      const defaultValue = `// script ${scriptName}
+function getDispatchStrategy() {
+  return (players, notes, syncTime) => {
+    // Your code here
+  }
+}
+      `
+      // create the script, it will be available to all node
+      await this.dispatchScripting.create(scriptName, defaultValue);
+      this.selectDispatchScript(scriptName);
+    }
+  }
+
+  async deleteDispatchScript(scriptName) {
+    await this.dispatchScripting.delete(scriptName);
+
+    if (this.dispatchScriptState.get('currentScript') === scriptName) {
+      this.dispatchScriptState.set({ currentScript: null });
+    }
+
+    this.render();
+  }
+
+  setDispatchScriptValue(value) {
+    if (this.currentDispatchScript) {
+      this.currentDispatchScript.setValue(value);
+    }
+  }
+
+  async updateCurrentDispatchScript(scriptName) {
+    if (this.currentDispatchScript) {
+      await this.currentDispatchScript.detach();
+    }
+
+    this.currentDispatchScript = await this.dispatchScripting.attach(scriptName);
+
+    // subscribe to update and re-execete the script
+    this.currentDispatchScript.subscribe(updates => {
+      if (updates.error) {
+        const error = updates.error;
+        console.log(error);
+        // you may display errors on the screen
+      }
+      else {
+        this.render();
+      }
+    });
+
+    this.currentDispatchScript.onDetach(() => {
+      this.currentDispatchScript = undefined;
+      this.render();
+    });
+
+    this.render();
+  }   
+
+  
 
   render() {
     render(html`
@@ -472,6 +553,9 @@ function getSynth() {
           margin-left: 20px;
         ">
           <h1 style="padding: 0; margin: 20px 0px">plugin scripting</h1>
+
+          <h2 style="padding: 0; margin: 20px 0px">synthesizers</h2>
+
           <section style="margin: 8px 0">
             <sc-text
               value="create script (cmd + s):"
@@ -509,7 +593,53 @@ function getSynth() {
             .value="${(this.currentSynthScript && this.currentSynthScript.getValue() || '')}"
             @change="${e => this.setSynthScriptValue(e.detail.value)}"
           ></sc-editor>
+
+
+
+          <h2 style="padding: 0; margin: 20px 0px">dispatch strategies</h2>
+
+          <section style="margin: 8px 0">
+            <sc-text
+              value="create script (cmd + s):"
+              readonly
+            ></sc-text>
+            <sc-text
+              @change="${e => this.createDispatchScript(e.detail.value)}"
+            ></sc-text>
+          </section>
+          ${this.dispatchScripting.getList().map((scriptName) => {
+            return html`
+              <section style="margin: 4px 0">
+                <sc-button
+                  value="${scriptName}"
+                  text="select ${scriptName}"
+                  @input="${() => this.selectDispatchScript(scriptName)}"
+                ></sc-button>
+                <sc-button
+                  value="${scriptName}"
+                  text="delete ${scriptName}"
+                  @input="${() => this.deleteDispatchScript(scriptName)}"
+                ></sc-button>
+              </section>
+            `;
+          })}
+          <sc-text
+            readonly
+            width="500"
+            value="open the console to see possible syntax errors when editing"
+          ></sc-text>
+          <sc-editor
+            style="display:block"
+            width="500"
+            height="300"
+            .value="${(this.currentDispatchScript && this.currentDispatchScript.getValue() || '')}"
+            @change="${e => this.setDispatchScriptValue(e.detail.value)}"
+          ></sc-editor>
+
         </div>  
+
+
+          
 
       </div>
 
