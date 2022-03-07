@@ -107,6 +107,7 @@ export default class Note {
       }
 
       if (this.data[key] !== null && this.data[key].length > 0) {
+        console.log(key);
         const envelope = new Envelope(envelopes[key], this.data[key], this.data.duration);
         this.envelopes.push(envelope);
       }

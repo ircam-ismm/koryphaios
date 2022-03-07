@@ -138,7 +138,7 @@ export default class AmSynth {
   }
 
   get modDepthParam() {
-    return this._modFreqConst.offset;
+    return this._modDepthConst.offset;
   }
 
   get modDepth() {
