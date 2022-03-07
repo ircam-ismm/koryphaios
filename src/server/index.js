@@ -277,8 +277,9 @@ server.stateManager.registerSchema('bufferBusControls', busControlsSchema);
       if ('defaultSynth' in updates) {
         // Info received from markers in bach, keep only existing synth as user
         // may use markers for other purpose
-        const availableSynth = ['sine', 'am', 'fm'].concat(synthScripting.getList());
-        if (!availableSynth.includes(updates.defaultSynth)) {
+        // const availableSynth = ['sine', 'am', 'fm'].concat(synthScripting.getList());
+        const availableSynths = currentState.availableSynths
+        if (!availableSynths.includes(updates.defaultSynth)) {
           return {
             ...updates,
             defaultSynth: currentState.defaultSynth,
@@ -358,10 +359,13 @@ server.stateManager.registerSchema('bufferBusControls', busControlsSchema);
 
 
     // Create new bus in case of custom synth scripts
-    const synthList = synthScripting.getList();
-    for (let i = 0; i < synthList.length; i++) {
-      const scriptName = synthList[i];
+    const existingSynths = Object.keys(busStates);
+    existingSynths.splice(existingSynths.indexOf('master'), 1);
+    const customSynthList = synthScripting.getList();
+    for (let i = 0; i < customSynthList.length; i++) {
+      const scriptName = customSynthList[i];
       if (!Object.keys(busStates).includes(scriptName)) {
+        existingSynths.push(scriptName);
         server.stateManager.registerSchema(`${scriptName}BusControls`, busControlsSchema);
         const scriptBusControls = await server.stateManager.create(`${scriptName}BusControls`, {
           name: scriptName,
@@ -369,15 +373,21 @@ server.stateManager.registerSchema('bufferBusControls', busControlsSchema);
         busStates[scriptName] = scriptBusControls;
       }
     }
+    
+    score.set({ availableSynths: existingSynths });
+
 
     synthScripting.observe(async () => {
-      const synthList = synthScripting.getList();
+      const customSynthList = synthScripting.getList();
       const existingSynths = Object.keys(busStates);
-      const defaultSynths = ['sine', 'am', 'fm'];
+      existingSynths.splice(existingSynths.indexOf('master'), 1);
+      const defaultSynths = ['sine', 'am', 'fm', 'buffer']; //Not optimal
 
-      for (let i = 0; i < synthList.length; i++) {
-        const scriptName = synthList[i];
+
+      for (let i = 0; i < customSynthList.length; i++) {
+        const scriptName = customSynthList[i];
         if (!existingSynths.includes(scriptName)) {
+          existingSynths.push(scriptName);
           server.stateManager.registerSchema(`${scriptName}BusControls`, busControlsSchema);
           const scriptBusControls = await server.stateManager.create(`${scriptName}BusControls`, {
             name: scriptName,
@@ -388,11 +398,14 @@ server.stateManager.registerSchema('bufferBusControls', busControlsSchema);
 
       for (let i = 0; i < existingSynths.length; i++) {
         const synthName = existingSynths[i];
-        if (!defaultSynths.includes(synthName) && !synthList.includes(synthName)) {
+        if (!defaultSynths.includes(synthName) && !customSynthList.includes(synthName)) {
+          existingSynths.splice(existingSynths.indexOf(synthName), 1);
           delete busStates[synthName];
           server.stateManager.deleteSchema(`${synthName}BusControls`);
         }
       }
+
+      score.set({ availableSynths: existingSynths});
     });
 
 

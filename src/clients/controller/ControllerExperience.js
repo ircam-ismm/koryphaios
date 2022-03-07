@@ -232,6 +232,7 @@ function getSynth() {
 }`
       // create the script, it will be available to all node
       await this.synthScripting.create(scriptName, defaultValue);
+
       this.selectSynthScript(scriptName);
     }
   }

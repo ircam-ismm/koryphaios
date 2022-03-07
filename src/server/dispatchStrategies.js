@@ -2,7 +2,7 @@ export default {
   /**
    * Send all notes to all players
    */
-  'send-all': (players, notes, syncTime) => {
+  'sendAll': (players, notes, syncTime) => {
     players.forEach(playerState => {
       playerState.set({ notes, startSyncTime: syncTime });
     }); 
@@ -13,7 +13,7 @@ export default {
    * - every player should have at least one note to play
    * - every notes should be played
    */
-  'random-spread': (players, notes, syncTime) => {
+  'randomSpread': (players, notes, syncTime) => {
     const numNotes = notes.length;
     const playersArray = Array.from(players);
     playersArray.sort((a, b) => Math.random() < 0.5 ? 1 : -1)
@@ -44,7 +44,7 @@ export default {
   /**
    * send all notes to a random player
    */
-  'random-point': (players, notes, syncTime) => {
+  'randomPoint': (players, notes, syncTime) => {
     const playersArray = Array.from(players);
     const randIdx = Math.floor(Math.random() * playersArray.length);
     const player = playersArray[randIdx];

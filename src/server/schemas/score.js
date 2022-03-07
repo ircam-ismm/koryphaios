@@ -22,7 +22,7 @@ export default {
   },
   dispatchStrategy: {
     type: 'string',
-    default: 'random-spread',
+    default: 'sendAll',
   },
   concertMode: {
     type: 'boolean',
@@ -36,6 +36,10 @@ export default {
   defaultSynth: {
     type: 'string',
     default: 'sine',
+  },
+  availableSynths: {
+    type: 'any',
+    default: ['sine', 'am', 'fm', 'buffer'],
   },
   offsetSyncTime: {
     type: 'float',
