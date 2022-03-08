@@ -16,6 +16,8 @@ import BufferSynth from './BufferSynth.js';
 //     fmModIndex: 4.206996917774388
 //   },
 
+
+//How to dynamically create this ?
 let noteDefaults = {
   frequency: 440.,
   detune: null,
@@ -77,27 +79,19 @@ export default class Note {
 
     const ctor = this.synthConstructors[this.data.synthType];
     this.synth = new ctor(this.audioContext);
-    this.synth.frequency = this.data.frequency;
 
-    if (this.data.synthType === 'am') {
-      this.synth.modFreq = this.data.amModFreq !== null && this.data.amModFreq.length > 0 ? 0 : this.data.amModFreq;
-      this.synth.modDepth = this.data.amModDepth !== null && this.data.amModDepth.length > 0 ? 0 : this.data.amModDepth;
-      envelopes['amModFreq'] = this.synth.modFreqParam;
-      envelopes['amModDepth'] = this.synth.modDepthParam;
-    } else if (this.data.synthType === 'fm') {
-      this.synth.harmonicity = this.data.fmHarmonicity !== null && this.data.fmHarmonicity.length > 0 ? 0 : this.data.fmHarmonicity;
-      this.synth.modIndex = this.data.fmModIndex !== null && this.data.fmModIndex.length > 0 ? 0 : this.data.fmModIndex;
-      envelopes['fmHarmonicity'] = this.synth.harmonicityParam;
-      envelopes['fmModIndex'] = this.synth.modIndexParam;
-    } else if (this.data.synthType === 'buffer') {
-      const buffer = audioBufferLoader.data[this.data.buffer];
-      this.synth.buffer = buffer;
-      this.synth.playbackRate = this.data.bufferPlaybackRate;
-    }
+    Object.entries(this.data).forEach(([key, value]) => {
+      if (key in this.synth) {
+        if (this.data[key] !== null && this.data[key].length > 0) {
+          this.synth[key] = 0;
+          envelopes[key] = this.synth[key+'Param'];
+        } else {
+          this.synth[key] = value;
+        } 
+      }
+    })
 
     this.synth.connect(this.env);
-
-    envelopes['detune'] = this.synth.detuneParam;
     
     //Init enveloppes 
     for (let key in envelopes) {
@@ -106,7 +100,7 @@ export default class Note {
         continue;
       }
 
-      if (this.data[key] !== null && this.data[key].length > 0) {
+      if (this.data[key] !== null && this.data[key].length > 0) { 
         const envelope = new Envelope(envelopes[key], this.data[key], this.data.duration);
         this.envelopes.push(envelope);
       }

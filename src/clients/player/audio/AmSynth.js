@@ -118,15 +118,15 @@ export default class AmSynth {
     this._carrier.type = type;
   }
 
-  get modFreqParam() {
+  get amModFreqParam() {
     return this._modFreqConst.offset;
   }
 
-  get modFreq() {
+  get amModFreq() {
     return this.userParams.modFreq.value;
   }
 
-  set modFreq(f) {
+  set amModFreq(f) {
     this.userParams.modFreq.value = f;
     const now = this.audioContext.currentTime;
     this._modFreqConst.offset.setTargetAtTime(f, now, 0.01);
@@ -137,15 +137,15 @@ export default class AmSynth {
     this._modulator.type = type;
   }
 
-  get modDepthParam() {
+  get amModDepthParam() {
     return this._modDepthConst.offset;
   }
 
-  get modDepth() {
+  get amModDepth() {
     return this.userParams.modDepth.value;
   }
 
-  set modDepth(depth) {
+  set amModDepth(depth) {
     const { min, max } = this.userParams.modDepth;
     depth = Math.min(max, Math.max(min, depth));
     this.userParams.modDepth.value = depth;

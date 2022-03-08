@@ -121,15 +121,15 @@
     this._carrier.type = type;
   }
 
-  get harmonicityParam() {
+  get fmHarmonicityParam() {
     return this._harmonicityConst.offset;
   }
 
-  get harmonicity() {
+  get fmHarmonicity() {
     return this.params.harmonicity.value;
   }
 
-  set harmonicity(r) {
+  set fmHarmonicity(r) {
     this.params.harmonicity.value = r;
 
     const now = this.audioContext.currentTime;
@@ -142,15 +142,15 @@
     this._modulator.type = type;
   }
 
-  get modIndexParam() {
+  get fmModIndexParam() {
     return this._modIndexConst.offset;
   }
 
-  get modIndex() {
+  get fmModIndex() {
     return this.params.modIndex.value;
   } 
 
-  set modIndex(val) {
+  set fmModIndex(val) {
     const {min, max} = this.params.modIndex;
     val = Math.min(max, Math.max(min, val));
     this.params.modIndex.value = val;
