@@ -16,8 +16,8 @@ function anything() {
 			var pos = freePos.shift();			
 			const row = pos%4
 			const column = Math.floor(pos/4)
-			const y = 100+row*30;
-			const x = 75+column*100;
+			const y = 35+row*30;
+			const x = 5+column*100;
 			
 			var mess = patch.newdefault(x, y, 'message');
 			mess.set(synthName)

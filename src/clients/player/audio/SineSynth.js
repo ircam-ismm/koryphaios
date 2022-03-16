@@ -18,6 +18,10 @@ export default class SineSynth {
     this._osc.frequency.setTargetAtTime(value, now, 0.01);
   }
 
+  set oscType(type) {
+    this._osc.type = type;
+  }
+
   connect(dest) {
     this._osc.connect(dest);
   }

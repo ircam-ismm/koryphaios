@@ -415,6 +415,23 @@ function getDispatchStrategy() {
             })}
           </div>
 
+          <!-- default synth -->
+          <div>
+            <h2>Default synth</h2>
+            ${this.score.get('availableSynths').map(name => {
+              let current = this.score.get('defaultSynth');
+              return html`
+                <sc-button
+                  style="display: block; margin-bottom: 4px"
+                  width="300"
+                  value="${name}"
+                  .selected="${name === current}"
+                  @input="${e => this.score.set({ defaultSynth: name })}"
+                ></sc-button>
+              `;
+            })}
+          </div>
+
           <!-- dispatch strategies -->
           <div>
             <h2>Dispatch strategies</h2>
@@ -431,6 +448,19 @@ function getDispatchStrategy() {
               `;
             })}
           </div>
+
+          <!-- dispatch strategies -->
+          <div>
+            <h2>Time synchronization offset</h2>
+            <p>Time added to synchronized playing time to provide enough time to the process of dispatching notes. Set higher for a larger number of connected clients.
+</p>
+            <sc-number
+              style="display: block; margin-bottom: 4px;"
+              value="${this.score.get('offsetSyncTime')}"
+              @change="${e => this.score.set({ offsetSyncTime: e.detail.value })}"
+            ></sc-number>
+          </div>
+
 
           <!-- logs -->
           <div>
