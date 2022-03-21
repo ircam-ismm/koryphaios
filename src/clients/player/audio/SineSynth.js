@@ -5,10 +5,6 @@ export default class SineSynth {
     this._osc = audioContext.createOscillator();
   }
 
-  get detuneParam() {
-    return this._osc.detune;
-  }
-
   get frequency() {
     return this._osc.frequency.value;
   }
@@ -16,6 +12,15 @@ export default class SineSynth {
   set frequency(value) {
     const now = this.audioContext.currentTime;
     this._osc.frequency.setTargetAtTime(value, now, 0.01);
+  }
+
+  set detune(value) {
+    const now = this.audioContext.currentTime;
+    this._osc.detune.setTargetAtTime(value, now, 0.01);
+  }
+
+  get detuneParam() {
+    return this._osc.detune;
   }
 
   set oscType(type) {

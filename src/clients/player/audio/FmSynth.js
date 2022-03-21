@@ -100,19 +100,24 @@
     this._modIndexConst.stop(time);
   }
 
-  get detuneParam() {
-    return this._carrier.detune;
-  }
-
-    get frequency() {
+  get frequency() {
     return this.params.carrFreq.value;
   }
 
-    set frequency(f) {
+  set frequency(f) {
     this.params.carrFreq.value = f;
 
     const now = this.audioContext.currentTime;
     this._carrFreqConst.offset.setTargetAtTime(f, now, 0.01);
+  }
+
+  set detune(value) {
+    const now = this.audioContext.currentTime;
+    this._carrier.detune.setTargetAtTime(value, now, 0.01);
+  }
+
+  get detuneParam() {
+    return this._carrier.detune;
   }
 
   set carrType(type) {

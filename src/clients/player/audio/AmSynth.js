@@ -99,10 +99,6 @@ export default class AmSynth {
     this._modDepthConst.stop(time);
   }
 
-  get detuneParam() {
-    return this._carrier.detune;
-  }
-
   get frequency() {
     return this.userParams.carrFreq.value;
   }
@@ -111,6 +107,15 @@ export default class AmSynth {
     this.userParams.carrFreq.value = f;
     const now = this.audioContext.currentTime;
     this._carrier.frequency.setTargetAtTime(f, now, 0.01);
+  }
+
+  set detune(value) {
+    const now = this.audioContext.currentTime;
+    this._carrier.detune.setTargetAtTime(value, now, 0.01);
+  }
+
+  get detuneParam() {
+    return this._carrier.detune;
   }
 
   set carrType(type) {
