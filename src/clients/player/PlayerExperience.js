@@ -4,7 +4,7 @@ import renderInitializationScreens from '@soundworks/template-helpers/client/ren
 import masters from 'waves-masters';
 
 import AudioBus from './audio/AudioBus';
-import SineSynth from './audio/SineSynth';
+import OscSynth from './audio/OscSynth';
 import FmSynth from './audio/FmSynth';
 import AmSynth from './audio/AmSynth';
 import BufferSynth from './audio/BufferSynth';
@@ -57,13 +57,13 @@ class PlayerExperience extends AbstractExperience {
     // bus for each synths
     this.synthBuses = {};
 
-    ['sine', 'am', 'fm', 'buffer'].forEach(synthType => {
+    ['osc', 'am', 'fm', 'buffer'].forEach(synthType => {
       this.synthBuses[synthType] = new AudioBus(this.audioContext, this.score.get('synthBusConfig'));
       this.synthBuses[synthType].connect(this.masterBus.input);
     });
 
     // test buses
-    // ['sine', 'am', 'fm'].forEach((synthType, index) => {
+    // ['osc', 'am', 'fm'].forEach((synthType, index) => {
     //   console.log('test bus:', synthType, 200 * (index + 1));
     //   const now = this.audioContext.currentTime;
     //   const osc = this.audioContext.createOscillator();
@@ -76,7 +76,7 @@ class PlayerExperience extends AbstractExperience {
     
     //constructors for synths
     this.synthConstructors = {
-      'sine': SineSynth,
+      'osc': OscSynth,
       'am': AmSynth,
       'fm': FmSynth,
       'buffer': BufferSynth,

@@ -7,7 +7,7 @@ import '@ircam/simple-components/sc-text.js';
 import GranularSynth from '../audio/GranularSynth.js';
 import FmSynth from '../audio/FmSynth.js';
 import AmSynth from '../audio/AmSynth.js';
-import SineSynth from '../audio/SineSynth.js'
+import OscSynth from '../audio/OscSynth.js'
 import AudioBus from '../audio/AudioBus.js';
 import audioBusSchema from '../../../server/schemas/busControls'
 
@@ -20,25 +20,25 @@ export default class Playground extends State {
 
     this.output = new GainNode(this.context.audioContext);
 
-    this.sineBus = new AudioBus(this.context.audioContext);
-    this.sineBus.mute = true;
+    this.oscBus = new AudioBus(this.context.audioContext);
+    this.oscBus.mute = true;
     this.amBus = new AudioBus(this.context.audioContext);
     this.amBus.mute = true;
     this.fmBus = new AudioBus(this.context.audioContext);
     this.fmBus.mute = true;
 
-    this.sineSynth = new SineSynth(this.context.audioContext);
+    this.oscSynth = new OscSynth(this.context.audioContext);
     this.amSynth = new AmSynth(this.context.audioContext);
     this.fmSynth = new FmSynth(this.context.audioContext);
 
 
     this.output.connect(this.context.audioContext.destination);
 
-    this.sineBus.connect(this.output);
+    this.oscBus.connect(this.output);
     this.amBus.connect(this.output);
     this.fmBus.connect(this.output);
 
-    this.sineSynth.connect(this.sineBus.input);
+    this.oscSynth.connect(this.oscBus.input);
     this.amSynth.connect(this.amBus.input);
     this.fmSynth.connect(this.fmBus.input);
 
@@ -46,7 +46,7 @@ export default class Playground extends State {
   }
 
   start() {
-    this.sineSynth.start();
+    this.oscSynth.start();
     this.amSynth.start();
     this.fmSynth.start();
   }
@@ -62,7 +62,7 @@ export default class Playground extends State {
       ></sc-button>
 
       <div>
-        <h2>sine synth</h2>
+        <h2>osc synth</h2>
         
         <div>
           <sc-text
@@ -71,8 +71,8 @@ export default class Playground extends State {
           ></sc-text>
           <sc-toggle
             id="$mute"
-            ?active="${this.sineBus.mute}"
-            @change="${e => this.sineBus.mute = e.detail.value}"
+            ?active="${this.oscBus.mute}"
+            @change="${e => this.oscBus.mute = e.detail.value}"
           ></sc-toggle>
         </div>
         <div>
@@ -86,8 +86,8 @@ export default class Playground extends State {
             display-number
             min="${this.busParams.volume.min}"
             max="${this.busParams.volume.max}"
-            value="${this.sineBus.volume}"
-            @input="${e => this.sineBus.volume = e.detail.value}"
+            value="${this.oscBus.volume}"
+            @input="${e => this.oscBus.volume = e.detail.value}"
           ></sc-slider>
         </div>
         <div>
@@ -101,8 +101,8 @@ export default class Playground extends State {
             display-number
             min="${40}"
             max="${5000}"
-            value="${this.sineSynth.frequency}"
-            @input="${e => this.sineSynth.frequency = e.detail.value}"
+            value="${this.oscSynth.frequency}"
+            @input="${e => this.oscSynth.frequency = e.detail.value}"
           ></sc-slider>
         </div>
       </div>

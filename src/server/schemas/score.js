@@ -35,11 +35,11 @@ export default {
   },
   defaultSynth: {
     type: 'string',
-    default: 'sine',
+    default: 'osc',
   },
   availableSynths: {
     type: 'any',
-    default: ['sine', 'am', 'fm', 'buffer'],
+    default: ['osc', 'am', 'fm', 'buffer'],
   },
   offsetSyncTime: {
     type: 'float',

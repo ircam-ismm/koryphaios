@@ -24,7 +24,7 @@ let noteDefaults = {
   velocity: 0,
   duration: 1,
   envelope: null,
-  synthType: 'sine',
+  synthType: 'osc',
   amModFreq: 0,
   amModDepth: 0,
   fmHarmonicity: 0,

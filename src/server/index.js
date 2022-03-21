@@ -81,7 +81,7 @@ server.stateManager.registerSchema('player', playerSchema);
 server.stateManager.registerSchema('synth-script', scriptSchema);
 server.stateManager.registerSchema('dispatch-script', scriptSchema);
 server.stateManager.registerSchema('masterBusControls', busControlsSchema);
-server.stateManager.registerSchema('sineBusControls', busControlsSchema);
+server.stateManager.registerSchema('oscBusControls', busControlsSchema);
 server.stateManager.registerSchema('amBusControls', busControlsSchema);
 server.stateManager.registerSchema('fmBusControls', busControlsSchema);
 server.stateManager.registerSchema('bufferBusControls', busControlsSchema);
@@ -126,10 +126,10 @@ server.stateManager.registerSchema('bufferBusControls', busControlsSchema);
     });
     busStates['master'] = masterBusControls;
 
-    const sineBusControls = await server.stateManager.create('sineBusControls', {
-      name: 'sine',
+    const oscBusControls = await server.stateManager.create('oscBusControls', {
+      name: 'osc',
     });
-    busStates['sine'] = sineBusControls;
+    busStates['osc'] = oscBusControls;
 
     const amBusControls = await server.stateManager.create('amBusControls', {
       name: 'am',
@@ -277,7 +277,7 @@ server.stateManager.registerSchema('bufferBusControls', busControlsSchema);
       if ('defaultSynth' in updates) {
         // Info received from markers in bach, keep only existing synth as user
         // may use markers for other purpose
-        // const availableSynth = ['sine', 'am', 'fm'].concat(synthScripting.getList());
+        // const availableSynth = ['osc', 'am', 'fm'].concat(synthScripting.getList());
         const availableSynths = currentState.availableSynths
         if (!availableSynths.includes(updates.defaultSynth)) {
           return {
@@ -381,7 +381,7 @@ server.stateManager.registerSchema('bufferBusControls', busControlsSchema);
       const customSynthList = synthScripting.getList();
       const existingSynths = Object.keys(busStates);
       existingSynths.splice(existingSynths.indexOf('master'), 1);
-      const defaultSynths = ['sine', 'am', 'fm', 'buffer']; //Not optimal
+      const defaultSynths = ['osc', 'am', 'fm', 'buffer']; //Not optimal
 
 
       for (let i = 0; i < customSynthList.length; i++) {

@@ -25,7 +25,7 @@ export default class Performance extends State {
         for (let i = 0; i < notes.length; i++) {
           const note = new Note(this.context.audioContext, notes[i], this.context.synthConstructors, this.context.audioBufferLoader);
           // use `note.data`, as it has been normalized with defaults
-          // const bus = this.context.synthBuses['sine'];
+          // const bus = this.context.synthBuses['osc'];
           const bus = this.context.synthBuses[note.data.synthType];
 
           note.connect(bus.input);
