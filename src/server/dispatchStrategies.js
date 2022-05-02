@@ -8,7 +8,6 @@ export default {
     }); 
   },
 
-
   /**
    * Dispatch notes in every player:
    * - every player should have at least one note to play
