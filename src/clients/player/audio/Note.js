@@ -59,6 +59,8 @@ export default class Note {
 
     this.data.velocity = decibelToLinear(this.data.velocity);
 
+    this.data.buffer = audioBufferLoader.data[this.data.buffer];
+
     // @note - from this point no further normalization should occur
     // console.log(this.data);
 
@@ -82,7 +84,7 @@ export default class Note {
 
     Object.entries(this.data).forEach(([key, value]) => {
       if (key in this.synth) {
-        if (this.data[key] !== null && this.data[key].length > 0) {
+        if (this.data[key] !== null && Array.isArray(this.data[key]) && this.data[key].length > 0) {
           this.synth[key] = 0;
           envelopes[key] = this.synth[key+'Param'];
         } else {
@@ -113,7 +115,9 @@ export default class Note {
 
   play(time) {
     this.start(time);
-    this.stop(time + this.data.duration);
+    this.stopTimeoutId = setTimeout(() => {
+      this.stop(time + this.data.duration);
+    }, this.data.duration * 1000);
   }
 
   start(time) {
@@ -128,6 +132,7 @@ export default class Note {
   };
 
   stop(time) {
+    clearTimeout(this.stopTimeoutId);
     time = Math.max(time, this.audioContext.currentTime);
 
     // if the envelop is clean we should already be at 0 gain from env,

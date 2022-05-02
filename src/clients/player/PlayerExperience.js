@@ -12,6 +12,9 @@ import BufferSynth from './audio/BufferSynth';
 import StateMachine from './states/StateMachine.js';
 
 
+const hash = window.location.hash.replace(/^#/, '');
+
+
 class PlayerExperience extends AbstractExperience {
   constructor(client, config, $container, audioContext) {
     super(client);
@@ -39,7 +42,10 @@ class PlayerExperience extends AbstractExperience {
 
     this.stateMachine = new StateMachine(this);
 
-    this.playerState = await this.client.stateManager.create('player', { group: this.group });
+    this.playerState = await this.client.stateManager.create('player', { 
+      group: this.group,
+      hash: hash
+    });
     this.playerState.subscribe(async updates => this.render());
 
     this.score = await this.client.stateManager.attach('score');

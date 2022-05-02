@@ -41,12 +41,14 @@ export default class Performance extends State {
       }
     });
 
-    this.scoreUnsubscribe = this.context.score.subscribe(updates => {
-      if ('transport' in updates) {
+    // Put this in playerState
+    this.scoreUnsubscribe = this.context.score.subscribe(updates => { 
+      if ('transport' in updates && this.activeNotes.size) {
         if (updates.transport === 'stop') {
           const now = this.context.audioContext.currentTime;
-          this.activeNotes.forEach(note => note.stop(now));
+          const notes = Array.from(this.activeNotes);
           this.activeNotes.clear();
+          notes.forEach(note => note.stop(now));
         }
       }
     });
@@ -75,7 +77,7 @@ export default class Performance extends State {
   render() {
     this.rafId = requestAnimationFrame(this.context.render);
 
-    if (this.rafIndex === 0) {
+    if (this.rafIndex === 0 && this.analyzer.getFloatTimeDomainData) {
       this.analyzer.getFloatTimeDomainData(this.signalBuffer);
 
       const length = this.signalBuffer.length;

@@ -1,5 +1,5 @@
 {
-  name: 'soundworks',
+  name: 'Koryphaios',
   author: '',
 
   clients: {
@@ -12,7 +12,7 @@
     },
   },
 
-  piece: 'O Tu Suavissima Virga',
-  composer: 'Hildegard von Bingen',
+  piece: 'Refraction',
+  composer: 'Luciano Leite Barbosa',
 
 }

@@ -9,6 +9,11 @@ export default {
     default: null,
     nullable: true,
   },
+  hash: {
+    type: 'string',
+    default: null,
+    nullable: true,
+  },
   // should ALWAYS be an array
   notes: {
     type: 'any',

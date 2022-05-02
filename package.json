@@ -1,9 +1,12 @@
 {
-  "name": "soundworks-template",
+  "name": "koryphaios",
   "authors": [
-    "Benjamin Matuszewski"
+    "Aliénor Golvet",
+    "Benjamin Matuszewski",
+    "Luciano Leite Barbosa",
+    "Étienne Démoulin"
   ],
-  "description": "soundworks application template",
+  "description": "composition environment for distributed music systems",
   "license": "BSD-3-Clause",
   "version": "3.0.0",
   "private": true,
