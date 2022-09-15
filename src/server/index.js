@@ -159,9 +159,11 @@ server.stateManager.registerSchema('bufferBusControls', busControlsSchema);
           const playerState = await server.stateManager.attach(schemaName, stateId);
           playerState.onDetach(() => {
             players.delete(playerState);
+            score.set({ connectedPlayers: players.size });
           });
 
           players.add(playerState);
+          score.set({connectedPlayers: players.size});
 
           // for testing
           // setTimeout(() => {

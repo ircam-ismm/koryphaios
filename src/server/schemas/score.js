@@ -55,6 +55,10 @@ export default {
     default: null,
     nullable: true,
   },
+  connectedPlayers: {
+    type: 'integer',
+    default: 0,
+  },
   // could be in bus states but creates problems for now
   masterBusConfig: {
     type: 'any',

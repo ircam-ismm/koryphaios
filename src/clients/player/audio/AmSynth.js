@@ -34,34 +34,34 @@ export default class AmSynth {
     };
 
     // create graph
-    this._output = new GainNode(this.audioContext);
+    this._output = this.audioContext.createGain();
 
-    this._modulated = new GainNode(this.audioContext);
+    this._modulated = this.audioContext.createGain();
     
-    this._carrier = new OscillatorNode(this.audioContext);
+    this._carrier = this.audioContext.createOscillator();
     this._carrier.frequency.value = this.userParams.carrFreq.default;
     this._carrier.type = this.userParams.carrType.default;
 
-    this._scale = new GainNode(this.audioContext);
+    this._scale = this.audioContext.createGain();
     this._scale.gain.value = 0.5;
 
-    this._depth = new GainNode(this.audioContext);
+    this._depth = this.audioContext.createGain();
     this._depth.gain.value = 0;
 
-    this._modulator = new OscillatorNode(this.audioContext);
+    this._modulator = this.audioContext.createOscillator();
     this._modulator.frequency.value = 0;
     this._modulator.type = this.userParams.modType.default;
 
-    this._modFreqConst = new ConstantSourceNode(this.audioContext);
+    this._modFreqConst = this.audioContext.createConstantSource();
     this._modFreqConst.offset.value = this.userParams.modFreq.default;
 
-    this._offset = new ConstantSourceNode(this.audioContext);
+    this._offset = this.audioContext.createConstantSource();
     this._offset.offset.value = 1;
 
-    this._gainMinus = new GainNode(this.audioContext);
+    this._gainMinus = this.audioContext.createGain();
     this._gainMinus.gain.value = -1;
 
-    this._modDepthConst = new ConstantSourceNode(this.audioContext);
+    this._modDepthConst = this.audioContext.createConstantSource();
     this._modDepthConst.offset.value = this.userParams.modDepth.default;
 
     

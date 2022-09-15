@@ -4,8 +4,8 @@ export default class BufferSynth {
 
     // this.baseFrequency = 261.63 // C4
 
-    this._output = new GainNode(this.audioContext);
-    this._bufferNode = new AudioBufferSourceNode(this.audioContext);
+    this._output = this.audioContext.createGain();
+    this._bufferNode = this.audioContext.createBufferSource();
 
     this._bufferNode.connect(this._output);
   }

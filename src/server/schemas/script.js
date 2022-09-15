@@ -7,5 +7,6 @@ export default {
     type: 'string',
     default: null,
     nullable: true,
+    event: true,
   },
 }

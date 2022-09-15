@@ -385,8 +385,10 @@ function getDispatchStrategy() {
           background-color: #121212;
           float: left;
         ">
+                
 
           <div>
+            <p>Connected players: ${this.score.get('connectedPlayers')}</p>  
             <h2>Performance State</h2>
 
             <div style="margin-bottom: 4px">

@@ -34,32 +34,32 @@
 
     // create graph
 
-    this._output = new GainNode(this.audioContext);
+    this._output = this.audioContext.createGain();
 
-    this._carrier = new OscillatorNode(this.audioContext);
+    this._carrier = this.audioContext.createOscillator();
     this._carrier.frequency.value = 0;
     this._carrier.type = this.params.carrType.default;
     
-    this._carrFreqConst = new ConstantSourceNode(this.audioContext);
+    this._carrFreqConst = this.audioContext.createConstantSource();
     this._carrFreqConst.offset.value = this.params.carrFreq.default;
 
-    this._modAmp = new GainNode(this.audioContext);
+    this._modAmp = this.audioContext.createGain();
     this._modAmp.gain.value = 0.0;
 
-    this._modulator = new OscillatorNode(this.audioContext);
+    this._modulator = this.audioContext.createOscillator();
     this._modulator.frequency.value = 0;
     this._modulator.type = this.params.modType.default;
 
-    this._carrFreqGain = new GainNode(this.audioContext);
+    this._carrFreqGain = this.audioContext.createGain();
     this._carrFreqGain.gain.value = 0;
 
-    this._harmonicityConst = new ConstantSourceNode(this.audioContext);
+    this._harmonicityConst = this.audioContext.createConstantSource();
     this._harmonicityConst.offset.value = this.params.harmonicity.default;
 
-    this._modFreqGain = new GainNode(this.audioContext);
+    this._modFreqGain = this.audioContext.createGain();
     this._modFreqGain.gain.value = 0.0;
 
-    this._modIndexConst = new ConstantSourceNode(this.audioContext);
+    this._modIndexConst = this.audioContext.createConstantSource();
     this._modIndexConst.offset.value = this.params.modIndex.default;
     
 
