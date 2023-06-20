@@ -3,23 +3,14 @@
 		"fileversion" : 1,
 		"appversion" : 		{
 			"major" : 8,
-<<<<<<< HEAD
-			"minor" : 2,
-			"revision" : 2,
-=======
 			"minor" : 1,
 			"revision" : 10,
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 			"architecture" : "x64",
 			"modernui" : 1
 		}
 ,
 		"classnamespace" : "box",
-<<<<<<< HEAD
-		"rect" : [ 409.0, 320.0, 2047.0, 1197.0 ],
-=======
 		"rect" : [ 598.0, 79.0, 834.0, 710.0 ],
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 		"bglocked" : 0,
 		"openinpresentation" : 0,
 		"default_fontsize" : 12.0,
@@ -982,13 +973,8 @@
 						"fileversion" : 1,
 						"appversion" : 						{
 							"major" : 8,
-<<<<<<< HEAD
-							"minor" : 2,
-							"revision" : 2,
-=======
 							"minor" : 1,
 							"revision" : 10,
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 							"architecture" : "x64",
 							"modernui" : 1
 						}
@@ -1116,13 +1102,8 @@
 						"fileversion" : 1,
 						"appversion" : 						{
 							"major" : 8,
-<<<<<<< HEAD
-							"minor" : 2,
-							"revision" : 2,
-=======
 							"minor" : 1,
 							"revision" : 10,
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 							"architecture" : "x64",
 							"modernui" : 1
 						}
@@ -1333,66 +1314,12 @@
 						"lines" : [  ],
 						"styles" : [ 							{
 								"name" : "default_style",
-<<<<<<< HEAD
-								"newobj" : 								{
-									"accentcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-									"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
-									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
-								}
-,
-								"button" : 								{
-									"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ],
-									"color" : [ 0.960784, 0.827451, 0.156863, 1.0 ]
-								}
-,
-=======
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 								"toggle" : 								{
 									"bgcolor" : [ 0.636487, 0.648652, 0.683149, 1.0 ],
 									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
 									"elementcolor" : [ 0.786675, 0.801885, 0.845022, 1.0 ]
 								}
 ,
-<<<<<<< HEAD
-								"parentstyle" : "",
-								"multi" : 1
-							}
-, 							{
-								"name" : "default_style-1",
-=======
-								"button" : 								{
-									"color" : [ 0.960784, 0.827451, 0.156863, 1.0 ],
-									"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ]
-								}
-,
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
-								"newobj" : 								{
-									"accentcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-									"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
-									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
-								}
-,
-<<<<<<< HEAD
-								"button" : 								{
-									"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ],
-									"color" : [ 0.960784, 0.827451, 0.156863, 1.0 ]
-								}
-,
-=======
-								"parentstyle" : "",
-								"multi" : 1
-							}
-, 							{
-								"name" : "default_style-1",
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
-								"toggle" : 								{
-									"bgcolor" : [ 0.636487, 0.648652, 0.683149, 1.0 ],
-									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
-									"elementcolor" : [ 0.786675, 0.801885, 0.845022, 1.0 ]
-								}
-,
-<<<<<<< HEAD
-=======
 								"button" : 								{
 									"color" : [ 0.960784, 0.827451, 0.156863, 1.0 ],
 									"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ]
@@ -1404,23 +1331,33 @@
 									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
 								}
 ,
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
+								"parentstyle" : "",
+								"multi" : 1
+							}
+, 							{
+								"name" : "default_style-1",
+								"toggle" : 								{
+									"bgcolor" : [ 0.636487, 0.648652, 0.683149, 1.0 ],
+									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
+									"elementcolor" : [ 0.786675, 0.801885, 0.845022, 1.0 ]
+								}
+,
+								"button" : 								{
+									"color" : [ 0.960784, 0.827451, 0.156863, 1.0 ],
+									"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ]
+								}
+,
+								"newobj" : 								{
+									"accentcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
+									"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
+									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
+								}
+,
 								"parentstyle" : "",
 								"multi" : 0
 							}
 , 							{
 								"name" : "master_style",
-<<<<<<< HEAD
-								"newobj" : 								{
-									"accentcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-									"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
-									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
-								}
-,
-								"slider" : 								{
-									"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
-									"color" : [ 0.461105, 0.492646, 0.591878, 1.0 ],
-=======
 								"umenu" : 								{
 									"bgfillcolor" : 									{
 										"type" : "gradient",
@@ -1461,67 +1398,16 @@
 								"toggle" : 								{
 									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
 									"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ],
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 									"elementcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ]
 								}
 ,
 								"ezadc~" : 								{
-<<<<<<< HEAD
-=======
 									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 									"bgcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
 									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
 									"elementcolor" : [ 0.862745, 0.870588, 0.878431, 1.0 ]
 								}
 ,
-<<<<<<< HEAD
-								"multislider" : 								{
-									"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
-									"color" : [ 0.0, 0.0, 0.0, 1.0 ]
-								}
-,
-								"button" : 								{
-									"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ],
-									"color" : [ 1.0, 0.95051, 0.0, 1.0 ],
-									"elementcolor" : [ 0.786675, 0.801885, 0.845022, 1.0 ]
-								}
-,
-								"attrui" : 								{
-									"bgcolor" : [ 0.786675, 0.801885, 0.845022, 1.0 ],
-									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
-								}
-,
-								"toggle" : 								{
-									"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ],
-									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
-									"elementcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ]
-								}
-,
-								"ezdac~" : 								{
-									"bgcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
-									"elementcolor" : [ 0.862745, 0.870588, 0.878431, 1.0 ]
-								}
-,
-								"function" : 								{
-									"bgcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-									"color" : [ 0.0, 0.0, 0.0, 1.0 ]
-								}
-,
-								"message" : 								{
-									"bgfillcolor" : 									{
-										"type" : "gradient",
-										"color1" : [ 0.786675, 0.801885, 0.845022, 1.0 ],
-										"color2" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-										"color" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
-										"angle" : 270.0,
-										"proportion" : 0.39,
-										"autogradient" : 0
-									}
-,
-									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
-=======
 								"gain~" : 								{
 									"color" : [ 1.0, 0.861448, 0.16921, 1.0 ],
 									"elementcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ]
@@ -1542,7 +1428,6 @@
 									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
 									"bgcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
 									"elementcolor" : [ 0.862745, 0.870588, 0.878431, 1.0 ]
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 								}
 ,
 								"button" : 								{
@@ -1590,13 +1475,8 @@
 						"fileversion" : 1,
 						"appversion" : 						{
 							"major" : 8,
-<<<<<<< HEAD
-							"minor" : 2,
-							"revision" : 2,
-=======
 							"minor" : 1,
 							"revision" : 10,
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 							"architecture" : "x64",
 							"modernui" : 1
 						}
@@ -1633,19 +1513,6 @@
 						"assistshowspatchername" : 0,
 						"boxes" : [ 							{
 								"box" : 								{
-<<<<<<< HEAD
-									"bgmode" : 0,
-									"border" : 0,
-									"clickthrough" : 0,
-									"enablehscroll" : 0,
-									"enablevscroll" : 0,
-									"id" : "obj-3",
-									"lockeddragscroll" : 0,
-									"lockedsize" : 0,
-									"maxclass" : "bpatcher",
-									"name" : "kp.concert-mode.maxpat",
-									"numinlets" : 0,
-=======
 									"bubble" : 1,
 									"bubblepoint" : 0.02,
 									"bubbleside" : 2,
@@ -1653,7 +1520,6 @@
 									"linecount" : 2,
 									"maxclass" : "comment",
 									"numinlets" : 1,
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 									"numoutlets" : 0,
 									"patching_rect" : [ 529.0, 172.5, 161.0, 52.0 ],
 									"text" : "if no synth is selected, osc will be set as the main synth"
@@ -1865,21 +1731,6 @@
 								}
 
 							}
-<<<<<<< HEAD
- ],
-						"lines" : [  ],
-						"styles" : [ 							{
-								"name" : "default_style",
-								"newobj" : 								{
-									"accentcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-									"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
-									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
-								}
-,
-								"button" : 								{
-									"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ],
-									"color" : [ 0.960784, 0.827451, 0.156863, 1.0 ]
-=======
 , 							{
 								"box" : 								{
 									"background" : 1,
@@ -1897,7 +1748,6 @@
 									"offset" : [ 0.0, 0.0 ],
 									"patching_rect" : [ 20.0, 228.0, 251.0, 160.0 ],
 									"viewvisibility" : 1
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 								}
 
 							}
@@ -1911,46 +1761,28 @@
 									"elementcolor" : [ 0.786675, 0.801885, 0.845022, 1.0 ]
 								}
 ,
-<<<<<<< HEAD
-								"parentstyle" : "",
-								"multi" : 1
-							}
-, 							{
-								"name" : "default_style-1",
-=======
 								"button" : 								{
 									"color" : [ 0.960784, 0.827451, 0.156863, 1.0 ],
 									"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ]
 								}
 ,
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 								"newobj" : 								{
 									"accentcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
 									"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
 									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
 								}
 ,
-<<<<<<< HEAD
-								"button" : 								{
-									"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ],
-									"color" : [ 0.960784, 0.827451, 0.156863, 1.0 ]
-								}
-,
-=======
 								"parentstyle" : "",
 								"multi" : 1
 							}
 , 							{
 								"name" : "default_style-1",
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 								"toggle" : 								{
 									"bgcolor" : [ 0.636487, 0.648652, 0.683149, 1.0 ],
 									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
 									"elementcolor" : [ 0.786675, 0.801885, 0.845022, 1.0 ]
 								}
 ,
-<<<<<<< HEAD
-=======
 								"button" : 								{
 									"color" : [ 0.960784, 0.827451, 0.156863, 1.0 ],
 									"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ]
@@ -1962,23 +1794,11 @@
 									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
 								}
 ,
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 								"parentstyle" : "",
 								"multi" : 0
 							}
 , 							{
 								"name" : "master_style",
-<<<<<<< HEAD
-								"newobj" : 								{
-									"accentcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-									"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
-									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
-								}
-,
-								"slider" : 								{
-									"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
-									"color" : [ 0.461105, 0.492646, 0.591878, 1.0 ],
-=======
 								"umenu" : 								{
 									"bgfillcolor" : 									{
 										"type" : "gradient",
@@ -2019,67 +1839,16 @@
 								"toggle" : 								{
 									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
 									"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ],
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 									"elementcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ]
 								}
 ,
 								"ezadc~" : 								{
-<<<<<<< HEAD
-=======
 									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 									"bgcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
 									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
 									"elementcolor" : [ 0.862745, 0.870588, 0.878431, 1.0 ]
 								}
 ,
-<<<<<<< HEAD
-								"multislider" : 								{
-									"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
-									"color" : [ 0.0, 0.0, 0.0, 1.0 ]
-								}
-,
-								"button" : 								{
-									"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ],
-									"color" : [ 1.0, 0.95051, 0.0, 1.0 ],
-									"elementcolor" : [ 0.786675, 0.801885, 0.845022, 1.0 ]
-								}
-,
-								"attrui" : 								{
-									"bgcolor" : [ 0.786675, 0.801885, 0.845022, 1.0 ],
-									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
-								}
-,
-								"toggle" : 								{
-									"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ],
-									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
-									"elementcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ]
-								}
-,
-								"ezdac~" : 								{
-									"bgcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
-									"elementcolor" : [ 0.862745, 0.870588, 0.878431, 1.0 ]
-								}
-,
-								"function" : 								{
-									"bgcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-									"color" : [ 0.0, 0.0, 0.0, 1.0 ]
-								}
-,
-								"message" : 								{
-									"bgfillcolor" : 									{
-										"type" : "gradient",
-										"color1" : [ 0.786675, 0.801885, 0.845022, 1.0 ],
-										"color2" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-										"color" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
-										"angle" : 270.0,
-										"proportion" : 0.39,
-										"autogradient" : 0
-									}
-,
-									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
-=======
 								"gain~" : 								{
 									"color" : [ 1.0, 0.861448, 0.16921, 1.0 ],
 									"elementcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ]
@@ -2100,7 +1869,6 @@
 									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
 									"bgcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
 									"elementcolor" : [ 0.862745, 0.870588, 0.878431, 1.0 ]
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 								}
 ,
 								"button" : 								{
@@ -2148,13 +1916,8 @@
 						"fileversion" : 1,
 						"appversion" : 						{
 							"major" : 8,
-<<<<<<< HEAD
-							"minor" : 2,
-							"revision" : 2,
-=======
 							"minor" : 1,
 							"revision" : 10,
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 							"architecture" : "x64",
 							"modernui" : 1
 						}
@@ -3162,66 +2925,12 @@
  ],
 						"styles" : [ 							{
 								"name" : "default_style",
-<<<<<<< HEAD
-								"newobj" : 								{
-									"accentcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-									"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
-									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
-								}
-,
-								"button" : 								{
-									"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ],
-									"color" : [ 0.960784, 0.827451, 0.156863, 1.0 ]
-								}
-,
-=======
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 								"toggle" : 								{
 									"bgcolor" : [ 0.636487, 0.648652, 0.683149, 1.0 ],
 									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
 									"elementcolor" : [ 0.786675, 0.801885, 0.845022, 1.0 ]
 								}
 ,
-<<<<<<< HEAD
-								"parentstyle" : "",
-								"multi" : 1
-							}
-, 							{
-								"name" : "default_style-1",
-=======
-								"button" : 								{
-									"color" : [ 0.960784, 0.827451, 0.156863, 1.0 ],
-									"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ]
-								}
-,
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
-								"newobj" : 								{
-									"accentcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-									"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
-									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
-								}
-,
-<<<<<<< HEAD
-								"button" : 								{
-									"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ],
-									"color" : [ 0.960784, 0.827451, 0.156863, 1.0 ]
-								}
-,
-=======
-								"parentstyle" : "",
-								"multi" : 1
-							}
-, 							{
-								"name" : "default_style-1",
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
-								"toggle" : 								{
-									"bgcolor" : [ 0.636487, 0.648652, 0.683149, 1.0 ],
-									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
-									"elementcolor" : [ 0.786675, 0.801885, 0.845022, 1.0 ]
-								}
-,
-<<<<<<< HEAD
-=======
 								"button" : 								{
 									"color" : [ 0.960784, 0.827451, 0.156863, 1.0 ],
 									"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ]
@@ -3233,20 +2942,33 @@
 									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
 								}
 ,
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
+								"parentstyle" : "",
+								"multi" : 1
+							}
+, 							{
+								"name" : "default_style-1",
+								"toggle" : 								{
+									"bgcolor" : [ 0.636487, 0.648652, 0.683149, 1.0 ],
+									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
+									"elementcolor" : [ 0.786675, 0.801885, 0.845022, 1.0 ]
+								}
+,
+								"button" : 								{
+									"color" : [ 0.960784, 0.827451, 0.156863, 1.0 ],
+									"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ]
+								}
+,
+								"newobj" : 								{
+									"accentcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
+									"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
+									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
+								}
+,
 								"parentstyle" : "",
 								"multi" : 0
 							}
 , 							{
 								"name" : "master_style",
-<<<<<<< HEAD
-								"newobj" : 								{
-									"accentcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-									"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
-									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
-								}
-,
-=======
 								"umenu" : 								{
 									"bgfillcolor" : 									{
 										"type" : "gradient",
@@ -3301,16 +3023,12 @@
 									"elementcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ]
 								}
 ,
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 								"slider" : 								{
 									"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
 									"color" : [ 0.461105, 0.492646, 0.591878, 1.0 ],
 									"elementcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ]
 								}
 ,
-<<<<<<< HEAD
-								"ezadc~" : 								{
-=======
 								"function" : 								{
 									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
 									"bgcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ]
@@ -3318,7 +3036,6 @@
 ,
 								"ezdac~" : 								{
 									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 									"bgcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
 									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
 									"elementcolor" : [ 0.862745, 0.870588, 0.878431, 1.0 ]
@@ -3335,65 +3052,10 @@
 									"elementcolor" : [ 0.786675, 0.801885, 0.845022, 1.0 ]
 								}
 ,
-<<<<<<< HEAD
-								"attrui" : 								{
-									"bgcolor" : [ 0.786675, 0.801885, 0.845022, 1.0 ],
-									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
-								}
-,
-								"toggle" : 								{
-									"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ],
-									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
-									"elementcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ]
-								}
-,
-								"ezdac~" : 								{
-									"bgcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
-									"elementcolor" : [ 0.862745, 0.870588, 0.878431, 1.0 ]
-								}
-,
-								"function" : 								{
-									"bgcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-									"color" : [ 0.0, 0.0, 0.0, 1.0 ]
-								}
-,
-								"message" : 								{
-									"bgfillcolor" : 									{
-										"type" : "gradient",
-										"color1" : [ 0.786675, 0.801885, 0.845022, 1.0 ],
-										"color2" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-										"color" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
-										"angle" : 270.0,
-										"proportion" : 0.39,
-										"autogradient" : 0
-									}
-,
-									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
-								}
-,
-								"umenu" : 								{
-									"bgfillcolor" : 									{
-										"type" : "gradient",
-										"color1" : [ 0.786675, 0.801885, 0.845022, 1.0 ],
-										"color2" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-										"color" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
-										"angle" : 270.0,
-										"proportion" : 0.39,
-										"autogradient" : 0
-									}
-
-								}
-,
-								"kslider" : 								{
-									"color" : [ 1.0, 1.0, 1.0, 1.0 ],
-									"elementcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ]
-=======
 								"newobj" : 								{
 									"accentcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
 									"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
 									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 								}
 ,
 								"gain~" : 								{
@@ -3430,13 +3092,8 @@
 						"fileversion" : 1,
 						"appversion" : 						{
 							"major" : 8,
-<<<<<<< HEAD
-							"minor" : 2,
-							"revision" : 2,
-=======
 							"minor" : 1,
 							"revision" : 10,
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 							"architecture" : "x64",
 							"modernui" : 1
 						}
@@ -3850,8 +3507,6 @@
  ],
 						"styles" : [ 							{
 								"name" : "default_style",
-<<<<<<< HEAD
-=======
 								"toggle" : 								{
 									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
 									"bgcolor" : [ 0.636487, 0.648652, 0.683149, 1.0 ],
@@ -3863,15 +3518,12 @@
 									"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ]
 								}
 ,
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 								"newobj" : 								{
 									"accentcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
 									"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
 									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
 								}
 ,
-<<<<<<< HEAD
-=======
 								"parentstyle" : "",
 								"multi" : 1
 							}
@@ -3883,51 +3535,11 @@
 									"elementcolor" : [ 0.786675, 0.801885, 0.845022, 1.0 ]
 								}
 ,
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 								"button" : 								{
 									"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ],
 									"color" : [ 0.960784, 0.827451, 0.156863, 1.0 ]
 								}
 ,
-<<<<<<< HEAD
-								"toggle" : 								{
-									"bgcolor" : [ 0.636487, 0.648652, 0.683149, 1.0 ],
-									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
-									"elementcolor" : [ 0.786675, 0.801885, 0.845022, 1.0 ]
-								}
-,
-								"parentstyle" : "",
-								"multi" : 1
-							}
-, 							{
-								"name" : "default_style-1",
-								"newobj" : 								{
-									"accentcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-									"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
-									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
-								}
-,
-								"button" : 								{
-									"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ],
-									"color" : [ 0.960784, 0.827451, 0.156863, 1.0 ]
-								}
-,
-								"toggle" : 								{
-									"bgcolor" : [ 0.636487, 0.648652, 0.683149, 1.0 ],
-									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
-									"elementcolor" : [ 0.786675, 0.801885, 0.845022, 1.0 ]
-								}
-,
-								"parentstyle" : "",
-								"multi" : 0
-							}
-, 							{
-								"name" : "master_style",
-								"newobj" : 								{
-									"accentcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-									"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
-									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
-=======
 								"newobj" : 								{
 									"accentcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
 									"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
@@ -3991,7 +3603,6 @@
 								"gain~" : 								{
 									"color" : [ 1.0, 0.861448, 0.16921, 1.0 ],
 									"elementcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ]
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 								}
 ,
 								"slider" : 								{
@@ -4000,9 +3611,6 @@
 									"elementcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ]
 								}
 ,
-<<<<<<< HEAD
-								"ezadc~" : 								{
-=======
 								"function" : 								{
 									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
 									"bgcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ]
@@ -4010,7 +3618,6 @@
 ,
 								"ezdac~" : 								{
 									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 									"bgcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
 									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
 									"elementcolor" : [ 0.862745, 0.870588, 0.878431, 1.0 ]
@@ -4027,65 +3634,10 @@
 									"elementcolor" : [ 0.786675, 0.801885, 0.845022, 1.0 ]
 								}
 ,
-<<<<<<< HEAD
-								"attrui" : 								{
-									"bgcolor" : [ 0.786675, 0.801885, 0.845022, 1.0 ],
-									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
-								}
-,
-								"toggle" : 								{
-									"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ],
-									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
-									"elementcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ]
-								}
-,
-								"ezdac~" : 								{
-									"bgcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-									"color" : [ 0.0, 0.0, 0.0, 1.0 ],
-									"elementcolor" : [ 0.862745, 0.870588, 0.878431, 1.0 ]
-								}
-,
-								"function" : 								{
-									"bgcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-									"color" : [ 0.0, 0.0, 0.0, 1.0 ]
-								}
-,
-								"message" : 								{
-									"bgfillcolor" : 									{
-										"type" : "gradient",
-										"color1" : [ 0.786675, 0.801885, 0.845022, 1.0 ],
-										"color2" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-										"color" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
-										"angle" : 270.0,
-										"proportion" : 0.39,
-										"autogradient" : 0
-									}
-,
-									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
-								}
-,
-								"umenu" : 								{
-									"bgfillcolor" : 									{
-										"type" : "gradient",
-										"color1" : [ 0.786675, 0.801885, 0.845022, 1.0 ],
-										"color2" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-										"color" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
-										"angle" : 270.0,
-										"proportion" : 0.39,
-										"autogradient" : 0
-									}
-
-								}
-,
-								"kslider" : 								{
-									"color" : [ 1.0, 1.0, 1.0, 1.0 ],
-									"elementcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ]
-=======
 								"newobj" : 								{
 									"accentcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
 									"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
 									"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 								}
 ,
 								"gain~" : 								{
@@ -4353,10 +3905,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-21", 0 ],
-<<<<<<< HEAD
-=======
 					"midpoints" : [ 678.35714285714289, 418.0, 32.5, 418.0 ],
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 					"source" : [ "obj-4", 6 ]
 				}
 
@@ -4439,18 +3988,6 @@
 		}
 ,
 		"dependency_cache" : [ 			{
-<<<<<<< HEAD
-				"name" : "addDispatchToGui.js",
-				"bootpath" : "~/dev/koryphaios/max/bpatchers",
-				"patcherrelativepath" : "../bpatchers",
-				"type" : "TEXT",
-				"implicit" : 1
-			}
-, 			{
-				"name" : "addSynthsToGui.js",
-				"bootpath" : "~/dev/koryphaios/max/bpatchers",
-				"patcherrelativepath" : "../bpatchers",
-=======
 				"name" : "kp.dispatchStrategy.maxpat",
 				"bootpath" : "~/Desktop/max2/bpatchers",
 				"patcherrelativepath" : "../max2/bpatchers",
@@ -4461,57 +3998,17 @@
 				"name" : "addDispatchToGui.js",
 				"bootpath" : "~/Desktop/max2/bpatchers",
 				"patcherrelativepath" : "../max2/bpatchers",
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 				"type" : "TEXT",
 				"implicit" : 1
 			}
 , 			{
-<<<<<<< HEAD
-				"name" : "bach.args.mxo",
-				"type" : "iLaX"
-			}
-, 			{
-				"name" : "bach.collect.mxo",
-				"type" : "iLaX"
-			}
-, 			{
-				"name" : "bach.expr.mxo",
-				"type" : "iLaX"
-			}
-, 			{
-				"name" : "bach.mc2f.maxpat",
-				"bootpath" : "~/Documents/Max 8/Packages/bach/patchers",
-				"patcherrelativepath" : "../../../../Documents/Max 8/Packages/bach/patchers",
-=======
 				"name" : "kp.offset-sync-time.maxpat",
 				"bootpath" : "~/Desktop/max2/bpatchers",
 				"patcherrelativepath" : "../max2/bpatchers",
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 				"type" : "JSON",
 				"implicit" : 1
 			}
 , 			{
-<<<<<<< HEAD
-				"name" : "bach.playkeys.mxo",
-				"type" : "iLaX"
-			}
-, 			{
-				"name" : "bach.portal.mxo",
-				"type" : "iLaX"
-			}
-, 			{
-				"name" : "bach.roll.mxo",
-				"type" : "iLaX"
-			}
-, 			{
-				"name" : "bach.wrap.mxo",
-				"type" : "iLaX"
-			}
-, 			{
-				"name" : "defineMappingGUI.js",
-				"bootpath" : "~/dev/koryphaios/max/bpatchers",
-				"patcherrelativepath" : "../bpatchers",
-=======
 				"name" : "kp.default_synth.maxpat",
 				"bootpath" : "~/Desktop/max2/bpatchers",
 				"patcherrelativepath" : "../max2/bpatchers",
@@ -4522,7 +4019,6 @@
 				"name" : "addSynthsToGui.js",
 				"bootpath" : "~/Desktop/max2/bpatchers",
 				"patcherrelativepath" : "../max2/bpatchers",
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 				"type" : "TEXT",
 				"implicit" : 1
 			}
@@ -4534,18 +4030,6 @@
 				"implicit" : 1
 			}
 , 			{
-<<<<<<< HEAD
-				"name" : "jscount.js",
-				"bootpath" : "~/Documents/packages/soundworks-state-manager-osc/max/SoundworksAPI/javascript",
-				"patcherrelativepath" : "../../../../Documents/packages/soundworks-state-manager-osc/max/SoundworksAPI/javascript",
-				"type" : "TEXT",
-				"implicit" : 1
-			}
-, 			{
-				"name" : "kp.am-controls.maxpat",
-				"bootpath" : "~/dev/koryphaios/max/bpatchers",
-				"patcherrelativepath" : "../bpatchers",
-=======
 				"name" : "kp.master-controls.maxpat",
 				"bootpath" : "~/Desktop/max2/bpatchers",
 				"patcherrelativepath" : "../max2/bpatchers",
@@ -4556,37 +4040,10 @@
 				"name" : "sw.shared-state.maxpat",
 				"bootpath" : "~/Documents/Max 8/Packages/SoundworksAPI/patchers",
 				"patcherrelativepath" : "../../Documents/Max 8/Packages/SoundworksAPI/patchers",
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 				"type" : "JSON",
 				"implicit" : 1
 			}
 , 			{
-<<<<<<< HEAD
-				"name" : "kp.buffer-controls.maxpat",
-				"bootpath" : "~/dev/koryphaios/max/bpatchers",
-				"patcherrelativepath" : "../bpatchers",
-				"type" : "JSON",
-				"implicit" : 1
-			}
-, 			{
-				"name" : "kp.concert-mode.maxpat",
-				"bootpath" : "~/dev/koryphaios/max/bpatchers",
-				"patcherrelativepath" : "../bpatchers",
-				"type" : "JSON",
-				"implicit" : 1
-			}
-, 			{
-				"name" : "kp.default_synth.maxpat",
-				"bootpath" : "~/dev/koryphaios/max/bpatchers",
-				"patcherrelativepath" : "../bpatchers",
-				"type" : "JSON",
-				"implicit" : 1
-			}
-, 			{
-				"name" : "kp.dispatchStrategy.maxpat",
-				"bootpath" : "~/dev/koryphaios/max/bpatchers",
-				"patcherrelativepath" : "../bpatchers",
-=======
 				"name" : "jscount.js",
 				"bootpath" : "~/Documents/Max 8/Packages/SoundworksAPI/javascript",
 				"patcherrelativepath" : "../../Documents/Max 8/Packages/SoundworksAPI/javascript",
@@ -4611,97 +4068,55 @@
 				"name" : "kp.am-controls.maxpat",
 				"bootpath" : "~/Desktop/max2/bpatchers",
 				"patcherrelativepath" : "../max2/bpatchers",
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 				"type" : "JSON",
 				"implicit" : 1
 			}
 , 			{
-<<<<<<< HEAD
-				"name" : "kp.env-collect.maxpat",
-				"bootpath" : "~/dev/koryphaios/max/bpatchers",
-				"patcherrelativepath" : "../bpatchers",
-=======
 				"name" : "kp.sine-controls.maxpat",
 				"bootpath" : "~/Desktop/max2/bpatchers",
 				"patcherrelativepath" : "../max2/bpatchers",
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 				"type" : "JSON",
 				"implicit" : 1
 			}
 , 			{
 				"name" : "kp.fm-controls.maxpat",
-<<<<<<< HEAD
-				"bootpath" : "~/dev/koryphaios/max/bpatchers",
-				"patcherrelativepath" : "../bpatchers",
-=======
 				"bootpath" : "~/Desktop/max2/bpatchers",
 				"patcherrelativepath" : "../max2/bpatchers",
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 				"type" : "JSON",
 				"implicit" : 1
 			}
 , 			{
-<<<<<<< HEAD
-				"name" : "kp.master-controls.maxpat",
-				"bootpath" : "~/dev/koryphaios/max/bpatchers",
-				"patcherrelativepath" : "../bpatchers",
-=======
 				"name" : "kp.buffer-controls.maxpat",
 				"bootpath" : "~/Desktop/max2/bpatchers",
 				"patcherrelativepath" : "../max2/bpatchers",
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 				"type" : "JSON",
 				"implicit" : 1
 			}
 , 			{
-<<<<<<< HEAD
-				"name" : "kp.offset-sync-time.maxpat",
-				"bootpath" : "~/dev/koryphaios/max/bpatchers",
-				"patcherrelativepath" : "../bpatchers",
-=======
 				"name" : "kp.to_soundworks.maxpat",
 				"bootpath" : "~/Desktop/max2/bpatchers",
 				"patcherrelativepath" : "../max2/bpatchers",
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 				"type" : "JSON",
 				"implicit" : 1
 			}
 , 			{
-<<<<<<< HEAD
-				"name" : "kp.sine-controls.maxpat",
-				"bootpath" : "~/dev/koryphaios/max/bpatchers",
-				"patcherrelativepath" : "../bpatchers",
-=======
 				"name" : "kp.env-collect.maxpat",
 				"bootpath" : "~/Desktop/max2/bpatchers",
 				"patcherrelativepath" : "../max2/bpatchers",
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 				"type" : "JSON",
 				"implicit" : 1
 			}
 , 			{
-<<<<<<< HEAD
-				"name" : "kp.to_soundworks.maxpat",
-				"bootpath" : "~/dev/koryphaios/max/bpatchers",
-				"patcherrelativepath" : "../bpatchers",
-=======
 				"name" : "bach.mc2f.maxpat",
 				"bootpath" : "~/Documents/Max 8/Packages/bach/patchers",
 				"patcherrelativepath" : "../../Documents/Max 8/Packages/bach/patchers",
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 				"type" : "JSON",
 				"implicit" : 1
 			}
 , 			{
-<<<<<<< HEAD
-				"name" : "mergeUpdates.js",
-				"bootpath" : "~/Documents/packages/soundworks-state-manager-osc/max/SoundworksAPI/javascript",
-				"patcherrelativepath" : "../../../../Documents/packages/soundworks-state-manager-osc/max/SoundworksAPI/javascript",
-=======
 				"name" : "defineMappingGUI.js",
 				"bootpath" : "~/Desktop/max2/bpatchers",
 				"patcherrelativepath" : "../max2/bpatchers",
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 				"type" : "TEXT",
 				"implicit" : 1
 			}
@@ -4716,66 +4131,12 @@
 		"autosave" : 0,
 		"styles" : [ 			{
 				"name" : "default_style",
-<<<<<<< HEAD
-				"newobj" : 				{
-					"accentcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-					"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
-					"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
-				}
-,
-				"button" : 				{
-					"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ],
-					"color" : [ 0.960784, 0.827451, 0.156863, 1.0 ]
-				}
-,
-=======
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 				"toggle" : 				{
 					"bgcolor" : [ 0.636487, 0.648652, 0.683149, 1.0 ],
 					"color" : [ 0.0, 0.0, 0.0, 1.0 ],
 					"elementcolor" : [ 0.786675, 0.801885, 0.845022, 1.0 ]
 				}
 ,
-<<<<<<< HEAD
-				"parentstyle" : "",
-				"multi" : 1
-			}
-, 			{
-				"name" : "default_style-1",
-=======
-				"button" : 				{
-					"color" : [ 0.960784, 0.827451, 0.156863, 1.0 ],
-					"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ]
-				}
-,
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
-				"newobj" : 				{
-					"accentcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-					"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
-					"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
-				}
-,
-<<<<<<< HEAD
-				"button" : 				{
-					"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ],
-					"color" : [ 0.960784, 0.827451, 0.156863, 1.0 ]
-				}
-,
-=======
-				"parentstyle" : "",
-				"multi" : 1
-			}
-, 			{
-				"name" : "default_style-1",
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
-				"toggle" : 				{
-					"bgcolor" : [ 0.636487, 0.648652, 0.683149, 1.0 ],
-					"color" : [ 0.0, 0.0, 0.0, 1.0 ],
-					"elementcolor" : [ 0.786675, 0.801885, 0.845022, 1.0 ]
-				}
-,
-<<<<<<< HEAD
-=======
 				"button" : 				{
 					"color" : [ 0.960784, 0.827451, 0.156863, 1.0 ],
 					"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ]
@@ -4787,23 +4148,33 @@
 					"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
 				}
 ,
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
+				"parentstyle" : "",
+				"multi" : 1
+			}
+, 			{
+				"name" : "default_style-1",
+				"toggle" : 				{
+					"bgcolor" : [ 0.636487, 0.648652, 0.683149, 1.0 ],
+					"color" : [ 0.0, 0.0, 0.0, 1.0 ],
+					"elementcolor" : [ 0.786675, 0.801885, 0.845022, 1.0 ]
+				}
+,
+				"button" : 				{
+					"color" : [ 0.960784, 0.827451, 0.156863, 1.0 ],
+					"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ]
+				}
+,
+				"newobj" : 				{
+					"accentcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
+					"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
+					"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
+				}
+,
 				"parentstyle" : "",
 				"multi" : 0
 			}
 , 			{
 				"name" : "master_style",
-<<<<<<< HEAD
-				"newobj" : 				{
-					"accentcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-					"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
-					"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
-				}
-,
-				"slider" : 				{
-					"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
-					"color" : [ 0.461105, 0.492646, 0.591878, 1.0 ],
-=======
 				"umenu" : 				{
 					"bgfillcolor" : 					{
 						"type" : "gradient",
@@ -4844,67 +4215,16 @@
 				"toggle" : 				{
 					"color" : [ 0.0, 0.0, 0.0, 1.0 ],
 					"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ],
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 					"elementcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ]
 				}
 ,
 				"ezadc~" : 				{
-<<<<<<< HEAD
-=======
 					"color" : [ 0.0, 0.0, 0.0, 1.0 ],
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 					"bgcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
 					"color" : [ 0.0, 0.0, 0.0, 1.0 ],
 					"elementcolor" : [ 0.862745, 0.870588, 0.878431, 1.0 ]
 				}
 ,
-<<<<<<< HEAD
-				"multislider" : 				{
-					"bgcolor" : [ 1.0, 1.0, 1.0, 1.0 ],
-					"color" : [ 0.0, 0.0, 0.0, 1.0 ]
-				}
-,
-				"button" : 				{
-					"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ],
-					"color" : [ 1.0, 0.95051, 0.0, 1.0 ],
-					"elementcolor" : [ 0.786675, 0.801885, 0.845022, 1.0 ]
-				}
-,
-				"attrui" : 				{
-					"bgcolor" : [ 0.786675, 0.801885, 0.845022, 1.0 ],
-					"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
-				}
-,
-				"toggle" : 				{
-					"bgcolor" : [ 0.682032, 0.698052, 0.748716, 1.0 ],
-					"color" : [ 0.0, 0.0, 0.0, 1.0 ],
-					"elementcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ]
-				}
-,
-				"ezdac~" : 				{
-					"bgcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-					"color" : [ 0.0, 0.0, 0.0, 1.0 ],
-					"elementcolor" : [ 0.862745, 0.870588, 0.878431, 1.0 ]
-				}
-,
-				"function" : 				{
-					"bgcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-					"color" : [ 0.0, 0.0, 0.0, 1.0 ]
-				}
-,
-				"message" : 				{
-					"bgfillcolor" : 					{
-						"type" : "gradient",
-						"color1" : [ 0.786675, 0.801885, 0.845022, 1.0 ],
-						"color2" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
-						"color" : [ 0.290196, 0.309804, 0.301961, 1.0 ],
-						"angle" : 270.0,
-						"proportion" : 0.39,
-						"autogradient" : 0
-					}
-,
-					"textcolor_inverse" : [ 0.0, 0.0, 0.0, 1.0 ]
-=======
 				"gain~" : 				{
 					"color" : [ 1.0, 0.861448, 0.16921, 1.0 ],
 					"elementcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ]
@@ -4925,7 +4245,6 @@
 					"color" : [ 0.0, 0.0, 0.0, 1.0 ],
 					"bgcolor" : [ 0.65098, 0.666667, 0.662745, 1.0 ],
 					"elementcolor" : [ 0.862745, 0.870588, 0.878431, 1.0 ]
->>>>>>> 75e3c6a14e33f99a3926e3e55714f48215016ebe
 				}
 ,
 				"button" : 				{
