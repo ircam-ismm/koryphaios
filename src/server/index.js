@@ -6,7 +6,7 @@ import JSON5 from 'json5';
 import serveStatic from 'serve-static';
 import compile from 'template-literal';
 
-import { StateManagerOsc } from '@soundworks/state-manager-osc';
+import { soundworksMax } from '@soundworks/max';
 
 import scoreSchema from './schemas/score.js';
 import playerSchema from './schemas/player.js';
@@ -88,6 +88,8 @@ server.stateManager.registerSchema('bufferBusControls', busControlsSchema);
 
 (async function launch() {
   try {
+    soundworksMax.init(server);
+
     await server.init(config, (clientType, config, httpRequest) => {
       return {
         clientType: clientType,
@@ -311,16 +313,6 @@ server.stateManager.registerSchema('bufferBusControls', busControlsSchema);
     await server.start();
     playerExperience.start();
     controllerExperience.start();
-
-    const oscConfig = { // these are the defaults
-      localAddress: '0.0.0.0',
-      localPort: 57121,
-      remoteAddress: '127.0.0.1',
-      remotePort: 57122,
-    };
-
-    const oscStateManager = new StateManagerOsc(server.stateManager, oscConfig);
-    await oscStateManager.init();
 
 
     // Add custom dispatch strategies 
