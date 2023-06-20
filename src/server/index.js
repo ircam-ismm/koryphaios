@@ -301,6 +301,7 @@ server.stateManager.registerSchema('bufferBusControls', busControlsSchema);
         const dispatchStrategy = score.get('dispatchStrategy');
         const syncTime = sync.getSyncTime() + score.get('offsetSyncTime');
         const dispatchFunc = dispatchStrategies[dispatchStrategy];
+
         dispatchFunc(players, updates.notes, syncTime);
       }
     });
@@ -317,39 +318,34 @@ server.stateManager.registerSchema('bufferBusControls', busControlsSchema);
 
     // Add custom dispatch strategies 
     const dispatchList = dispatchScripting.getList();
-    for (let i = 0; i < dispatchList.length; i++) {
-      const scriptName = dispatchList[i];
-      if (!Object.keys(dispatchStrategies).includes(scriptName)) {
-        const script = await dispatchScripting.attach(scriptName);
-        const dispatchFunc = script.execute();
-        dispatchStrategies[scriptName] = dispatchFunc;
-      }
+    // console.log(dispatchList);
+    for (let scriptName of dispatchList) {
+      const script = await dispatchScripting.attach(scriptName);
+      script.subscribe(() => dispatchStrategies[scriptName] = script.execute());
+      dispatchStrategies[scriptName] = script.execute();
     }
+    
     score.set({dispatchStrategies : Object.keys(dispatchStrategies)});
 
-    dispatchScripting.observe(async () => {
-      const dispatchList = dispatchScripting.getList();
-      const existingStrat = Object.keys(dispatchStrategies);
-      const defaultStrategies = Object.keys(defaultDispatchStrategies);
+    dispatchScripting.observe(async (newValues, oldValues) => {
+      const newNames = newValues.list;
+      const oldNames = oldValues.list;
+      
+      const addedNames = newNames.filter(name => !oldNames.includes(name));
+      const deletedNames = oldNames.filter(name => !newNames.includes(name));
 
-      for (let i = 0; i < dispatchList.length; i++) {
-        const scriptName = dispatchList[i];
-        if (!existingStrat.includes(scriptName)) {
-          const script = await dispatchScripting.attach(scriptName);
-          const dispatchFunc = script.execute();
-          dispatchStrategies[scriptName] = dispatchFunc;
-        }
+      for (let scriptName of addedNames) {
+        const script = await dispatchScripting.attach(scriptName);
+        script.subscribe(() => dispatchStrategies[scriptName] = script.execute());
+        dispatchStrategies[scriptName] = script.execute();
       }
 
-      for (let i = 0; i < existingStrat.length; i++) {
-        const scriptName = existingStrat[i];
-        if (!defaultStrategies.includes(scriptName) && !dispatchList.includes(scriptName)) {
-          delete dispatchStrategies[scriptName];
-        }
+      for (let scriptName of deletedNames) {
+        delete dispatchStrategies[scriptName];
       }
 
       score.set({ dispatchStrategies: Object.keys(dispatchStrategies) });
-    });
+    }, true);
 
 
     // Create new bus in case of custom synth scripts

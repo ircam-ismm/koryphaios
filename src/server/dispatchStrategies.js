@@ -51,20 +51,4 @@ export default {
 
     player.set({ notes, startSyncTime: syncTime });
   },
-
-  'nrandomPoint': (players, notes, syncTime) => {
-    const n = 4;
-    const randChosen = new Set();
-    const playersArray = Array.from(players);
-    for (let i = 0; i < n; i++) {
-      const randIdx = Math.floor(Math.random() * playersArray.length);
-      if (!randChosen.has(randIdx)) {
-        const player = playersArray[randIdx];
-        player.set({ notes, startSyncTime: syncTime });
-        randChosen.add(randIdx);
-      }
-    }
-  },
-
-  
 }
