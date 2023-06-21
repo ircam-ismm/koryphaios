@@ -12,6 +12,7 @@ You will need :
 - [Node.js](https://nodejs.org/en/) latest LTS version
 - Max/MSP
 - The bach library for Max/MSP (download [here](https://www.bachproject.net/) or through Max's package manager)
+- [The soundworks Max package](https://github.com/collective-soundworks/soundworks-max)
 
 _Koryphaios_ unravels its full potential when used on a local network. We assume you know how to create such a network.
 
