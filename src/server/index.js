@@ -344,7 +344,7 @@ server.stateManager.registerSchema('bufferBusControls', busControlsSchema);
         delete dispatchStrategies[scriptName];
       }
 
-      score.set({ dispatchStrategies: Object.keys(dispatchStrategies) });
+      score.set({ dispatchStrategies: Object.keys(dispatchStrategies) }); 
     }, true);
 
 
