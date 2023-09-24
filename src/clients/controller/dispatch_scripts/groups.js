@@ -5,7 +5,6 @@ function getDispatchStrategy() {
     const groupb = notes.filter(note => note.label === 'b');
     const noGroup = notes.filter(note => note.label !== 'a' && note.label !== 'b'); 
     
-    console.log(groupa, noGroup);
     
     players.forEach(playerState => {
     	const hash = playerState.get('hash');

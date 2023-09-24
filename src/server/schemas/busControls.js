@@ -5,8 +5,8 @@ export default {
     nullable: true,
   },
   mute: {
-    type: 'boolean',
-    default: false,
+    type: 'integer',
+    default: 0,
   },
   volume: {
     type: 'float',

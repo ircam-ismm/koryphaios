@@ -47,7 +47,7 @@ export default class AudioBus {
     this._output = this.audioContext.createGain();
 
     this._mute = this.audioContext.createGain(); 
-    this._mute.gain.value = this.params.mute.default ? 0 : 1;
+    this._mute.gain.value = this.params.mute.default;
     this._mute.connect(this._output);
 
     if (panning) {
@@ -85,7 +85,7 @@ export default class AudioBus {
           const now = this.audioContext.currentTime;
           const { min, max } = this.params.panning;
           val = Math.min(max, Math.max(min, val));
-          this._panner.pan.setTargetAtTime(val, now, 0.01);
+          this._panner.pan.setTargetAtTime(val, now, 0.02);
         }
       });
     }
@@ -99,7 +99,7 @@ export default class AudioBus {
           const now = this.audioContext.currentTime;
           const { min, max } = this.params.lowPassFreq;
           val = Math.min(max, Math.max(min, val));
-          this._lowpass.frequency.setTargetAtTime(val, now, 0.01);
+          this._lowpass.frequency.setTargetAtTime(val, now, 0.02);
         }
       });
 
@@ -111,7 +111,7 @@ export default class AudioBus {
           const now = this.audioContext.currentTime;
           const { min, max } = this.params.highPassFreq;
           val = Math.min(max, Math.max(min, val));
-          this._highpass.frequency.setTargetAtTime(val, now, 0.01);
+          this._highpass.frequency.setTargetAtTime(val, now, 0.02);
         }
       });
     }
@@ -126,14 +126,10 @@ export default class AudioBus {
     return this.muteflag;
   }
 
-  set mute(flag) {
-    this.muteflag = flag;
+  set mute(value) {
+    this.muteflag = 1 - value;
     const now = this.audioContext.currentTime;
-    if (flag) {
-      this._mute.gain.setTargetAtTime(0, now, 0.01);
-    } else {
-      this._mute.gain.setTargetAtTime(1, now, 0.01);
-    }
+    this._mute.gain.setTargetAtTime(this.muteflag, now, 0.01);
   }
 
   get volume() {
@@ -146,7 +142,7 @@ export default class AudioBus {
     db = Math.min(max, Math.max(min, db)); // clamp
 
     const val = decibelToLinear(db);
-    this._volume.gain.setTargetAtTime(val, now, 0.01);
+    this._volume.gain.setTargetAtTime(val, now, 0.02);
   }
 
   connect(dest) {

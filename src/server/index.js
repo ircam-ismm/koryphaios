@@ -294,6 +294,7 @@ server.stateManager.registerSchema('bufferBusControls', busControlsSchema);
 
     score.subscribe(async updates => {
       if ('notes' in updates) {
+        console.log(updates.notes);
         if (players.size === 0) {
           return;
         }

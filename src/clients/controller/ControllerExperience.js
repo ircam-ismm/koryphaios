@@ -128,7 +128,6 @@ class ControllerExperience extends AbstractExperience {
           const key = control.split('-')[1];
           switch (key) {
             case 'mute':
-              console.log(value);
               const muteVal = this.busStates[synthType].get('mute');
               if (value === 127) {
                 this.busStates[synthType].set({ mute: !muteVal });
@@ -183,53 +182,54 @@ class ControllerExperience extends AbstractExperience {
   async createSynthScript(scriptName) {
     if (scriptName !== '') {
       const defaultValue = `// script ${scriptName}
-function getSynth() {
-  return class CustomSynth {
-    constructor(audioContext) {
-      this.audioContext = audioContext;
+        function getSynth() {
+          return class CustomSynth {
+            constructor(audioContext) {
+              this.audioContext = audioContext;
 
-      // Array to store all sound sources
-      this.sources = [];
+              // Array to store all sound sources
+              this.sources = [];
 
-      // Create nodes 
-      this.output = new GainNode(audioContext); 
-      this._osc = new OscillatorNode(audioContext);
-      this.sources.push(this._osc);
+              // Create nodes 
+              this.output = new GainNode(audioContext); 
+              this._osc = new OscillatorNode(audioContext);
+              this.sources.push(this._osc);
 
-      // Connect nodes to output
-      this._osc.connect(this.output);
-    }
+              // Connect nodes to output
+              this._osc.connect(this.output);
+            }
 
-    get detuneParam() {
-      return this._osc.detune;
-    }
+            get detuneParam() {
+              return this._osc.detune;
+            }
 
-    get frequency() {
-      return this._osc.frequency.value;
-    }
+            get frequency() {
+              return this._osc.frequency.value;
+            }
 
-    set frequency(value) {
-      const now = this.audioContext.currentTime;
-      this._osc.frequency.setTargetAtTime(value, now, 0.01);
-    }
+            set frequency(value) {
+              const now = this.audioContext.currentTime;
+              this._osc.frequency.setTargetAtTime(value, now, 0.01);
+            }
 
-    connect(dest) {
-      this.output.connect(dest);
-    }
+            connect(dest) {
+              this.output.connect(dest);
+            }
 
-    disconnect(dest) {
-      this.output.disconnect(dest);
-    }
+            disconnect(dest) {
+              this.output.disconnect(dest);
+            }
 
-    start(time) {
-      this.sources.forEach(src => {src.start(time)});
-    }
+            start(time) {
+              this.sources.forEach(src => {src.start(time)});
+            }
 
-    stop(time) {
-      this.sources.forEach(src => {src.stop(time)});
-    }
-  }
-}`
+            stop(time) {
+              this.sources.forEach(src => {src.stop(time)});
+            }
+          }
+        }
+      `
       // create the script, it will be available to all node
       await this.synthScripting.create(scriptName, defaultValue);
 
@@ -454,8 +454,7 @@ function getDispatchStrategy() {
           <!-- dispatch strategies -->
           <div>
             <h2>Time synchronization offset</h2>
-            <p>Time added to synchronized playing time to provide enough time to the process of dispatching notes. Set higher for a larger number of connected clients.
-</p>
+            <p>Time added to synchronized playing time to provide enough time to the process of dispatching notes. Set higher for a larger number of connected clients.</p>
             <sc-number
               style="display: block; margin-bottom: 4px;"
               value="${this.score.get('offsetSyncTime')}"

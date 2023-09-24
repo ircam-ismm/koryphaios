@@ -144,7 +144,6 @@ class PlayerExperience extends AbstractExperience {
         }
       }
 
-      console.log(this.synthConstructors);
     });
 
 
