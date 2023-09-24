@@ -58,6 +58,10 @@ async function launch(index) {
     //   supportedExtensionRegExp: /\.(wav|mp3|ogg|json)$/i,
     // }, []);
     client.pluginManager.register('checkin', pluginCheckinFactory, {}, []);
+    client.pluginManager.register('audio-buffer-loader', pluginAudioBufferLoaderFactory, {}, []);
+    client.pluginManager.register('filesystem', pluginFilesystemFactory, {}, []);
+    client.pluginManager.register('synth-scripting', pluginScriptingFactory, {}, []);
+
     // -------------------------------------------------------------------
     // launch application
     // -------------------------------------------------------------------
